@@ -1,4 +1,5 @@
 package wumpusworld;
+import java.util.*;
 
 /**
  * Contains starting code for creating your own Wumpus World agent.
@@ -10,7 +11,8 @@ public class MyAgent implements Agent
 {
     private World w;
     int rnd;
-    
+    List<MyPRoom> availableRooms;
+    List<MyPRoom> allRooms;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -18,7 +20,24 @@ public class MyAgent implements Agent
      */
     public MyAgent(World world)
     {
-        w = world;   
+        w = world;
+        availableRooms = new ArrayList<MyPRoom>();
+        allRooms = new ArrayList<MyPRoom>();
+
+        for(int i = 0; i < w.getSize(); i++)
+        {
+            for(int j = 0; j < w.getSize(); j++)
+            {
+                allRooms.add(new MyPRoom(i+1, j+1));
+            }
+        }
+
+        // commented out code used to verify that all rooms have been added
+        for(int i = 0; i < w.getSize()*w.getSize(); i++)
+        {
+            MyPRoom tmp = allRooms.get(i);
+            System.out.println(tmp.getX() + ", " + tmp.getY() + " " + tmp.getPerception());
+        }
     }
    
             
@@ -32,7 +51,7 @@ public class MyAgent implements Agent
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
         
-        
+        addAvailableRooms(cX, cY);
         //Basic action:
         //Grab Gold if we can.
         if (w.hasGlitter(cX, cY))
@@ -107,7 +126,53 @@ public class MyAgent implements Agent
                 
     }    
     
-     /**
+    void addAvailableRooms(int playerX, int playerY)
+    {
+        if(w.isValidPosition(playerX + 1, playerY))
+        {
+            MyPRoom tmp = allRooms.get(((playerX + 1) + playerY*4));
+
+            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
+            {
+                availableRooms.add(tmp);
+                //System.out.println("Added room!" + (playerX + 1) + ", " + playerY);
+            }
+        }
+
+        if(w.isValidPosition(playerX - 1, playerY))
+        {
+            MyPRoom tmp = allRooms.get(((playerX - 1) + playerY*4));
+
+            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
+            {
+                availableRooms.add(tmp);
+                //System.out.println("Added room!" + (playerX - 1) + ", " + playerY);
+            }
+        }
+
+        if(w.isValidPosition(playerX, playerY + 1))
+        {
+            MyPRoom tmp = allRooms.get(((playerX) + (playerY + 1)*4));
+
+            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
+            {
+                availableRooms.add(tmp);
+                //System.out.println("Added room!" + playerX+ ", " + (playerY + 1));
+            }
+        }
+
+        if(w.isValidPosition(playerX, playerY - 1))
+        {
+            MyPRoom tmp = allRooms.get(((playerX) + (playerY - 1)*4));
+
+            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
+            {
+                availableRooms.add(tmp);
+                //System.out.println("Added room!" + playerX + ", " + (playerY - 1));
+            }
+        }
+    } 
+    /**
      * Genertes a random instruction for the Agent.
      */
     public int decideRandomMove()
