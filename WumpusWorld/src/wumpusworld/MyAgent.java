@@ -13,6 +13,7 @@ public class MyAgent implements Agent
     int rnd;
     List<MyPRoom> availableRooms;
     List<MyPRoom> allRooms;
+    List<MyPRoom> safeRooms;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -21,8 +22,10 @@ public class MyAgent implements Agent
     public MyAgent(World world)
     {
         w = world;
+
         availableRooms = new ArrayList<MyPRoom>();
         allRooms = new ArrayList<MyPRoom>();
+        safeRooms = new ArrayList<MyPRoom>();
 
         for(int i = 0; i < w.getSize(); i++)
         {
@@ -51,7 +54,6 @@ public class MyAgent implements Agent
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
         
-        addAvailableRooms(cX, cY);
         //Basic action:
         //Grab Gold if we can.
         if (w.hasGlitter(cX, cY))
@@ -98,6 +100,9 @@ public class MyAgent implements Agent
             System.out.println("I am facing Down");
         }
         
+        addAvailableRooms(cX, cY);
+        addSafeRooms();
+
         //decide next move
         rnd = decideRandomMove();
         if (rnd==0)
@@ -128,50 +133,85 @@ public class MyAgent implements Agent
     
     void addAvailableRooms(int playerX, int playerY)
     {
+        MyPRoom tmpe = allRooms.get((playerX - 1)*4 + playerY - 1);
+        System.out.println(tmpe.getX() + ", " + tmpe.getY());
+
         if(w.isValidPosition(playerX + 1, playerY))
         {
-            MyPRoom tmp = allRooms.get(((playerX + 1) + playerY*4));
+            MyPRoom tmp = allRooms.get((((playerX)*4) + playerY - 1));
 
             if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
             {
                 availableRooms.add(tmp);
-                //System.out.println("Added room!" + (playerX + 1) + ", " + playerY);
+                System.out.println("Added room!" + (tmp.getX()) + ", " + tmp.getY());
             }
         }
 
         if(w.isValidPosition(playerX - 1, playerY))
         {
-            MyPRoom tmp = allRooms.get(((playerX - 1) + playerY*4));
+            MyPRoom tmp = allRooms.get(((playerX - 2)*4 + playerY - 1));
 
             if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
             {
                 availableRooms.add(tmp);
-                //System.out.println("Added room!" + (playerX - 1) + ", " + playerY);
+                System.out.println("Added room!" + (tmp.getX()) + ", " + tmp.getY());
             }
         }
 
         if(w.isValidPosition(playerX, playerY + 1))
         {
-            MyPRoom tmp = allRooms.get(((playerX) + (playerY + 1)*4));
+            MyPRoom tmp = allRooms.get(((playerX - 1)*4 + (playerY)));
 
             if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
             {
                 availableRooms.add(tmp);
-                //System.out.println("Added room!" + playerX+ ", " + (playerY + 1));
+                System.out.println("Added room!" + tmp.getX() + ", " + (tmp.getY()));
             }
         }
 
         if(w.isValidPosition(playerX, playerY - 1))
         {
-            MyPRoom tmp = allRooms.get(((playerX) + (playerY - 1)*4));
+            MyPRoom tmp = allRooms.get(((playerX - 1)*4 + (playerY - 2)));
 
             if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
             {
                 availableRooms.add(tmp);
-                //System.out.println("Added room!" + playerX + ", " + (playerY - 1));
+                System.out.println("Added room!" + tmp.getX() + ", " + (tmp.getY()));
             }
         }
     } 
+    
+    void addSafeRooms()
+    {
+        for(int i = 0; i < availableRooms.size(); i++)
+        {
+            MyPRoom tmp = availableRooms.get(i);
+            int x = tmp.getX();
+            int y = tmp.getY();
+            if(pitNo(x,y) && wumpNo(x,y))
+            {
+                // Found a room that absoluteley does not have a wumpus or pit within. 
+                // Add to rooms which we can move to.
+                safeRooms.add(tmp);
+            }
+        }
+    }
+    
+    boolean pitNo(int x, int y)
+    {
+        return     w.isValidPosition(x + 1, y) && !w.hasBreeze(x + 1, y) && !w.isUnknown(x + 1, y)
+                || w.isValidPosition(x - 1, y) && !w.hasBreeze(x - 1, y) && !w.isUnknown(x - 1, y)
+                || w.isValidPosition(x, y + 1) && !w.hasBreeze(x, y + 1) && !w.isUnknown(x, y + 1)
+                || w.isValidPosition(x, y - 1) && !w.hasBreeze(x, y - 1) && !w.isUnknown(x, y - 1);
+    }
+
+    boolean wumpNo(int x, int y)
+    {
+        return     w.isValidPosition(x + 1, y) && w.isValidPosition(x + 1, y) && !w.hasStench(x + 1, y) && !w.isUnknown(x + 1, y)
+                || w.isValidPosition(x - 1, y) && w.isValidPosition(x - 1, y) && !w.hasStench(x - 1, y) && !w.isUnknown(x - 1, y)
+                || w.isValidPosition(x, y + 1) && w.isValidPosition(x, y + 1) && !w.hasStench(x, y + 1) && !w.isUnknown(x, y + 1)
+                || w.isValidPosition(x, y - 1) && w.isValidPosition(x, y - 1) && !w.hasStench(x, y - 1) && !w.isUnknown(x, y - 1);
+    }
     /**
      * Genertes a random instruction for the Agent.
      */
