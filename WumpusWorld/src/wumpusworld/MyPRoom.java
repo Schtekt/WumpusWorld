@@ -11,7 +11,7 @@ public class MyPRoom
         m_x = x;
         m_y = y;
 
-        m_p = World.UNKOWN;
+        m_p = World.UNKNOWN;
     }
 
     public int getX()
