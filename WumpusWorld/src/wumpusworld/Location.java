@@ -55,8 +55,9 @@ public class Location implements Comparable
      * value = higher priority.
      * 
      * @param o Location object.
-     * @return 1 if prio(o) > prio(this). -1 if prio(o) > prio(this). 0 otherwise.
      */
+
+    // @return 1 if prio(o) > prio(this). -1 if prio(o) > prio(this). 0 otherwise.
     public int compareTo(Object o)
     {
         Location l = (Location)o;
