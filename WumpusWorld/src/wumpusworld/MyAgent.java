@@ -35,12 +35,14 @@ public class MyAgent implements Agent
             }
         }
 
+        allRooms.get(0).setPerception(percieveRoom(1,1));
+
         // commented out code used to verify that all rooms have been added
-        for(int i = 0; i < w.getSize()*w.getSize(); i++)
+        /*for(int i = 0; i < w.getSize()*w.getSize(); i++)
         {
             MyPRoom tmp = allRooms.get(i);
             System.out.println(tmp.getX() + ", " + tmp.getY() + " " + tmp.getPerception());
-        }
+        }*/
     }
    
             
@@ -212,6 +214,46 @@ public class MyAgent implements Agent
                 || w.isValidPosition(x, y + 1) && w.isValidPosition(x, y + 1) && !w.hasStench(x, y + 1) && !w.isUnknown(x, y + 1)
                 || w.isValidPosition(x, y - 1) && w.isValidPosition(x, y - 1) && !w.hasStench(x, y - 1) && !w.isUnknown(x, y - 1);
     }
+    
+    String percieveRoom(int x, int y)
+    {
+        String tmp = "";
+        
+        if(w.isUnknown(x, y))
+        {
+            tmp += World.UNKNOWN;
+        }
+        else
+        {
+            if(w.hasStench(x, y))
+            {
+                tmp += World.STENCH;
+            }
+
+            if(w.hasBreeze(x, y))
+            {
+                tmp += World.BREEZE;
+            }
+
+            if(w.hasPit(x, y))
+            {
+                tmp += World.PIT;
+            }
+
+            if(w.hasGlitter(x, y))
+            {
+                tmp += World.GLITTER;
+            }
+
+            if(w.hasWumpus(x, y))
+            {
+                tmp += World.WUMPUS;
+            }
+        }
+
+        return tmp;
+    }
+    
     /**
      * Genertes a random instruction for the Agent.
      */
