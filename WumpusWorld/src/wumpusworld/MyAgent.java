@@ -15,10 +15,11 @@ public class MyAgent implements Agent
     int rnd;
     int count = 0;
     List<MyPRoom> availableRooms;
+    LinkedList<MyPRoom> availableRoomsDeque;
+    LinkedList<MyPRoom> safeRoomsDeque;
     // Uneccessary?
     //List<MyPRoom> allRooms;
     List<MyPRoom> safeRooms;
-    List<MyPRoom> visitedRooms;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -30,10 +31,11 @@ public class MyAgent implements Agent
 
         availableRooms = new ArrayList<MyPRoom>();
         safeRooms = new ArrayList<MyPRoom>();
-        visitedRooms = new ArrayList<MyPRoom>();
-        MyPRoom tmp = new MyPRoom(1,1);
-        tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
-        visitedRooms.add(tmp);
+        //visitedRooms = new ArrayList<MyPRoom>();
+        availableRoomsDeque = new LinkedList<MyPRoom>();
+        safeRoomsDeque = new LinkedList<MyPRoom>();
+        //MyPRoom tmp = new MyPRoom(1,1);
+        //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
     }
    
             
@@ -99,20 +101,20 @@ public class MyAgent implements Agent
         try
         {
             String content = "";
-            content += "When player was in position (" + cX + ", " + cY + ") on turn " + ++count + "\nThe ai found following rooms as available ones:\n";
-            for(int i = 0; i < availableRooms.size(); i++)
+            content += "When player was in position (" + cX + ", " + cY + ") and turned to " + w.getDirection() + " on turn " + ++count + "\nThe ai found following rooms as available ones:\n";
+            for(int i = 0; i < availableRoomsDeque.size(); i++)
             {
-                MyPRoom tmp = availableRooms.get(i);
+                MyPRoom tmp = availableRoomsDeque.get(i);
                 content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
             }
 
-            if(safeRooms.size() > 0)
+            if(safeRoomsDeque.size() > 0)
             {
                 content += "It also found theese rooms to be safe.\n";
 
-                for(int i = 0; i < safeRooms.size(); i++)
+                for(int i = 0; i < safeRoomsDeque.size(); i++)
                 {
-                    MyPRoom tmp = safeRooms.get(i);
+                    MyPRoom tmp = safeRoomsDeque.get(i);
                     content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
                 }
             }
@@ -204,6 +206,42 @@ public class MyAgent implements Agent
     
     void addAvailableRooms(int playerX, int playerY)
     {
+        int x = playerX + (w.getDirection() -2)%2;
+        int y = playerY + (w.getDirection() - 1) % 2;
+        if(w.isValidPosition(x, y) && !w.isVisited(x, y))
+        {
+            MyPRoom tmp = new MyPRoom(x, y);
+            if(!availableRoomsDeque.contains(tmp))
+                availableRoomsDeque.push(tmp);
+        }
+
+        x = playerX + (w.getDirection() - 1) % 2;
+        y = playerY + (2 - w.getDirection()) % 2;
+        if(w.isValidPosition(x, y) && !w.isVisited(x, y))
+        {
+            MyPRoom tmp = new MyPRoom(x, y);
+            if(!availableRoomsDeque.contains(tmp))
+                availableRoomsDeque.push(tmp);
+        }
+
+        x = playerX + (1 - w.getDirection()) % 2;        
+        y = playerY + (w.getDirection() - 2) % 2;
+        if(w.isValidPosition(x, y) && !w.isVisited(x, y))
+        {
+            MyPRoom tmp = new MyPRoom(x, y);
+            if(!availableRoomsDeque.contains(tmp))
+                availableRoomsDeque.push(tmp);
+        }
+
+        x = playerX + (2 - w.getDirection()) % 2;
+        y = playerY + (1 - w.getDirection()) % 2;
+        if(w.isValidPosition(x, y) && !w.isVisited(x, y))
+        {
+            MyPRoom tmp = new MyPRoom(x, y);
+            if(!availableRoomsDeque.contains(tmp))
+                availableRoomsDeque.push(tmp);
+        }
+
         if(w.isValidPosition(playerX + 1, playerY) && !w.isVisited(playerX + 1, playerY))
         {
             MyPRoom tmp = new MyPRoom(playerX + 1, playerY);
@@ -248,6 +286,16 @@ public class MyAgent implements Agent
     void updateAvailableRooms(int playerX, int playerY)
     {
         addAvailableRooms(playerX, playerY);
+
+        for(int i = 0; i < availableRoomsDeque.size(); i++)
+        {
+            MyPRoom tmp = availableRoomsDeque.get(i);
+            if(w.isVisited(tmp.getX(), tmp.getY()))
+            {
+                availableRoomsDeque.remove(i);
+            }
+        }
+
         for(int i = 0; i < availableRooms.size(); i++)
         {
             MyPRoom tmp = availableRooms.get(i);
@@ -280,6 +328,27 @@ public class MyAgent implements Agent
             if(w.isVisited(tmp.getX(), tmp.getY()))
             {
                 safeRooms.remove(i);
+            }
+        }
+
+        for(int i = 0; i < availableRoomsDeque.size(); i++)
+        {
+            MyPRoom tmp = availableRoomsDeque.get(i);
+            int x = tmp.getX();
+            int y = tmp.getY();
+
+            if(pitNo(x,y) && wumpNo(x,y) && !safeRoomsDeque.contains(tmp))
+            {
+                safeRoomsDeque.add(tmp);
+            }
+        }
+
+        for(int i = 0; i < safeRoomsDeque.size(); i++)
+        {
+            MyPRoom tmp = safeRoomsDeque.get(i);
+            if(w.isVisited(tmp.getX(), tmp.getY()))
+            {
+                safeRoomsDeque.remove(i);
             }
         }
     }
@@ -387,6 +456,29 @@ public class MyAgent implements Agent
         return normalized%2 + Math.abs(normalized % 2 - 1)*normalized;
     }
 
+    int calcMoveCost(int playX, int playY, int tarX, int tarY, int currDirection)
+    {
+        if(w.isValidPosition(playX + 1, playY))
+        {
+            calcMoveCost(playX + 1, playY, tarX, tarY, World.DIR_RIGHT);
+        }
+
+        if(w.isValidPosition(playX - 1, playY))
+        {
+            calcMoveCost(playX - 1, playY, tarX, tarY, World.DIR_LEFT);
+        }
+
+        if(w.isValidPosition(playX, playY + 1))
+        {
+            calcMoveCost(playX, playY + 1, tarX, tarY, World.DIR_UP);
+        }
+
+        if(w.isValidPosition(playX, playY - 1))
+        {
+            calcMoveCost(playX, playY - 1, tarX, tarY, World.DIR_DOWN);
+        }
+        return 0;
+    }
     /**
      * Genertes a random instruction for the Agent.
      */

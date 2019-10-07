@@ -5,6 +5,9 @@ public class MyPRoom
     private int m_x;
     private int m_y;
 
+    private int m_g;
+    private int m_f;
+
     private boolean m_stench;
     private boolean m_breeze;
     private boolean m_glitter;
@@ -17,6 +20,9 @@ public class MyPRoom
     {
         m_x = x;
         m_y = y;
+        
+        m_g = -1;
+        m_f = -1;
 
         m_stench = false;
         m_breeze = false;
@@ -26,9 +32,9 @@ public class MyPRoom
         m_unknown = true;
     }
 
-    public boolean equals(MyPRoom other)
+    public boolean equals(Object other)
     {
-        if(m_x == other.m_x && m_y == other.m_y)
+        if(m_x == ((MyPRoom)other).m_x && m_y == ((MyPRoom)other).m_y)
         {
             return true;
         }
@@ -83,5 +89,25 @@ public class MyPRoom
         m_glitter = hasGlitter;
         m_pit = hasPit;
         m_wumpus = hasWumpus;
+    }
+
+    public int getG()
+    {
+        return m_g;
+    }
+
+    public int getF()
+    {
+        return m_f;
+    }
+
+    public void setG(int value)
+    {
+        m_g = value;
+    }
+
+    public void setF(int value)
+    {
+        m_f = value;
     }
 }
