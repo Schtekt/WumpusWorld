@@ -26,6 +26,15 @@ public class MyPRoom
         m_unknown = true;
     }
 
+    public boolean equals(MyPRoom other)
+    {
+        if(m_x == other.m_x && m_y == other.m_y)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public int getX()
     {
         return m_x;

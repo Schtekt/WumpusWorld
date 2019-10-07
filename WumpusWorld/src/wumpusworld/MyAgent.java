@@ -90,8 +90,8 @@ public class MyAgent implements Agent
             System.out.println("I am facing Down");
         }
         
-        addAvailableRooms(cX, cY);
-        addSafeRooms();
+        updateAvailableRooms(cX, cY);
+        updateSafeRooms();
 
         //decide next move
         rnd = decideRandomMove();
@@ -214,18 +214,40 @@ public class MyAgent implements Agent
         }
     }
 
-    void addSafeRooms()
+    void updateAvailableRooms(int playerX, int playerY)
+    {
+        addAvailableRooms(playerX, playerY);
+        for(int i = 0; i < availableRooms.size(); i++)
+        {
+            MyPRoom tmp = availableRooms.get(i);
+            if(w.isVisited(tmp.getX(), tmp.getY()))
+            {
+                availableRooms.remove(i);
+            }
+        }
+    }
+    void updateSafeRooms()
     {
         for(int i = 0; i < availableRooms.size(); i++)
         {
             MyPRoom tmp = availableRooms.get(i);
             int x = tmp.getX();
             int y = tmp.getY();
-            if(pitNo(x,y) && wumpNo(x,y))
+
+            if(pitNo(x,y) && wumpNo(x,y) && !safeRooms.contains(tmp))
             {
                 // Found a room that absoluteley does not have a wumpus or pit within. 
                 // Add to rooms which we can move to.
                 safeRooms.add(tmp);
+            }
+        }
+
+        for(int i = 0; i < safeRooms.size(); i++)
+        {
+            MyPRoom tmp = safeRooms.get(i);
+            if(w.isVisited(tmp.getX(), tmp.getY()))
+            {
+                safeRooms.remove(i);
             }
         }
     }
