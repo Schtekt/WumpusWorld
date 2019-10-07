@@ -12,8 +12,10 @@ public class MyAgent implements Agent
     private World w;
     int rnd;
     List<MyPRoom> availableRooms;
-    List<MyPRoom> allRooms;
+    // Uneccessary?
+    //List<MyPRoom> allRooms;
     List<MyPRoom> safeRooms;
+    List<MyPRoom> visitedRooms;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -24,25 +26,11 @@ public class MyAgent implements Agent
         w = world;
 
         availableRooms = new ArrayList<MyPRoom>();
-        allRooms = new ArrayList<MyPRoom>();
         safeRooms = new ArrayList<MyPRoom>();
 
-        for(int i = 0; i < w.getSize(); i++)
-        {
-            for(int j = 0; j < w.getSize(); j++)
-            {
-                allRooms.add(new MyPRoom(i+1, j+1));
-            }
-        }
-
-        allRooms.get(0).setPerception(percieveRoom(1,1));
-
-        // commented out code used to verify that all rooms have been added
-        /*for(int i = 0; i < w.getSize()*w.getSize(); i++)
-        {
-            MyPRoom tmp = allRooms.get(i);
-            System.out.println(tmp.getX() + ", " + tmp.getY() + " " + tmp.getPerception());
-        }*/
+        MyPRoom tmp = new MyPRoom(1,1);
+        tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
+        visitedRooms.add(tmp);
     }
    
             
@@ -132,8 +120,8 @@ public class MyAgent implements Agent
         }
                 
     }    
-    
-    void addAvailableRooms(int playerX, int playerY)
+    //based on uneccesary system.
+    /*void addAvailableRooms(int playerX, int playerY)
     {
         MyPRoom tmpe = allRooms.get((playerX - 1)*4 + playerY - 1);
         System.out.println(tmpe.getX() + ", " + tmpe.getY());
@@ -181,8 +169,51 @@ public class MyAgent implements Agent
                 System.out.println("Added room!" + tmp.getX() + ", " + (tmp.getY()));
             }
         }
-    } 
+    }*/
     
+    void addAvailableRooms(int playerX, int playerY)
+    {
+        if(w.isValidPosition(playerX + 1, playerY) && !w.isVisited(playerX + 1, playerY))
+        {
+            MyPRoom tmp = new MyPRoom(playerX + 1, playerY);
+            
+            if(!availableRooms.contains(tmp))
+            {
+                availableRooms.add(tmp);
+            }
+        }
+
+        if(w.isValidPosition(playerX - 1, playerY) && !w.isVisited(playerX - 1, playerY))
+        {
+            MyPRoom tmp = new MyPRoom(playerX - 1, playerY);
+            
+            if(!availableRooms.contains(tmp))
+            {
+                availableRooms.add(tmp);
+            }
+        }
+
+        if(w.isValidPosition(playerX, playerY + 1) && !w.isVisited(playerX, playerY + 1))
+        {
+            MyPRoom tmp = new MyPRoom(playerX, playerY + 1);
+            
+            if(!availableRooms.contains(tmp))
+            {
+                availableRooms.add(tmp);
+            }
+        }
+
+        if(w.isValidPosition(playerX, playerY - 1) && !w.isVisited(playerX - 1, playerY))
+        {
+            MyPRoom tmp = new MyPRoom(playerX, playerY - 1);
+            
+            if(!availableRooms.contains(tmp))
+            {
+                availableRooms.add(tmp);
+            }
+        }
+    }
+
     void addSafeRooms()
     {
         for(int i = 0; i < availableRooms.size(); i++)

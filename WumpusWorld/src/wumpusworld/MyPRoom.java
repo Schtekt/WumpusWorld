@@ -4,14 +4,26 @@ public class MyPRoom
 {
     private int m_x;
     private int m_y;
-    private String m_p;
+
+    private boolean m_stench;
+    private boolean m_breeze;
+    private boolean m_glitter;
+    private boolean m_wumpus;
+    private boolean m_pit;
+    private boolean m_gold;
+    private boolean m_unknown;
 
     public MyPRoom(int x, int y)
     {
         m_x = x;
         m_y = y;
 
-        m_p = World.UNKNOWN;
+        m_stench = false;
+        m_breeze = false;
+        m_glitter = false;
+        m_wumpus = false;
+        m_pit = false;
+        m_unknown = true;
     }
 
     public int getX()
@@ -24,13 +36,42 @@ public class MyPRoom
         return m_y;
     }
 
-    public String getPerception()
+    public boolean hasStench()
     {
-        return m_p;
+        return m_stench;
     }
 
-    public void setPerception(String perception)
+    public boolean hasBreeze()
     {
-        m_p = perception;
+        return m_breeze;
+    }
+
+    public boolean hasGlitter()
+    {
+        return m_glitter;
+    }
+
+    public boolean hasWumpus()
+    {
+        return m_wumpus;
+    }
+    public boolean hasPit()
+    {
+        return m_pit;
+    }
+
+    public boolean isUnknown()
+    {
+        return m_unknown;
+    }
+
+    public void setPerception(boolean hasStench, boolean hasBreeze, boolean hasGlitter, boolean hasWumpus, boolean hasPit)
+    {
+        m_unknown = false;
+        m_stench = hasStench;
+        m_breeze = hasBreeze;
+        m_glitter = hasGlitter;
+        m_pit = hasPit;
+        m_wumpus = hasWumpus;
     }
 }
