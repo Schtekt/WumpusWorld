@@ -257,6 +257,7 @@ public class MyAgent implements Agent
             }
         }
     }
+    
     void updateSafeRooms()
     {
         for(int i = 0; i < availableRooms.size(); i++)
@@ -338,6 +339,29 @@ public class MyAgent implements Agent
         return tmp;
     }
     
+    int calcDirectionalCost(int corrDirection, int currDirection)
+    {
+        /*
+        say we input 1 and 3.
+        normalized = 2
+        normalized % 2 = 0.
+        returns 0 + abs(0-1)*2 = 2.
+
+        say we input 2 and 1. (vice versa gives same result)
+        normalized = 1.
+        normalized % 2 = 1.
+        returns 1 + abs(1 - 1)*1 = 1.
+
+        say we input 4 and 4.
+        normalized = 0.
+        normalized % 2 = 0.
+        returns 0 + abs(0 -1) * 0 = 0
+        */
+        int normalized = Math.abs(corrDirection - currDirection);
+
+        return normalized%2 + Math.abs(normalized % 2 - 1)*normalized;
+    }
+
     /**
      * Genertes a random instruction for the Agent.
      */

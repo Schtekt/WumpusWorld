@@ -64,6 +64,7 @@ public class MyPRoom
     {
         return m_wumpus;
     }
+    
     public boolean hasPit()
     {
         return m_pit;
