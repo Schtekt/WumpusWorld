@@ -339,6 +339,31 @@ public class MyAgent implements Agent
         return tmp;
     }
     
+    /**
+     * calculates the correct direction the player has to face to move into an adjacent room.
+     * calculate relative coordinates by subtracting next location by the current location.
+     * @param relX relative X coordinate. Either 1 or -1 or 0. (next - current)
+     * @param relY relative Y coordinate. Either 1 or -1 or 0. (next - current)
+     * @return the direction the player should face to move towards the next room.
+     */
+    int calcCorrectDirection(int relX, int relY)
+    {
+        /*
+            insätt 1, 0 (detta ska bli 0).
+            abs(1 - 1 + 2*0) = 0
+
+            0,1
+            abs(0-1 + 2*1) = 1
+
+            -1,0
+            abs(-1-1 + 2*0) = 2
+
+            0,-1
+            abs(0-1 + 2*-1) = 3
+        */
+        return Math.abs(relX - 1 + 2*relY);
+    }
+
     int calcDirectionalCost(int corrDirection, int currDirection)
     {
         /*
