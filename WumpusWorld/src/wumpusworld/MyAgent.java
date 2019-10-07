@@ -27,7 +27,7 @@ public class MyAgent implements Agent
 
         availableRooms = new ArrayList<MyPRoom>();
         safeRooms = new ArrayList<MyPRoom>();
-
+        visitedRooms = new ArrayList<MyPRoom>();
         MyPRoom tmp = new MyPRoom(1,1);
         tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
         visitedRooms.add(tmp);
@@ -203,7 +203,7 @@ public class MyAgent implements Agent
             }
         }
 
-        if(w.isValidPosition(playerX, playerY - 1) && !w.isVisited(playerX - 1, playerY))
+        if(w.isValidPosition(playerX, playerY - 1) && !w.isVisited(playerX, playerY - 1))
         {
             MyPRoom tmp = new MyPRoom(playerX, playerY - 1);
             
