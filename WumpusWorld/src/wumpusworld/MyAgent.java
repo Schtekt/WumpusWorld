@@ -1,4 +1,6 @@
 package wumpusworld;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -11,6 +13,7 @@ public class MyAgent implements Agent
 {
     private World w;
     int rnd;
+    int count = 0;
     List<MyPRoom> availableRooms;
     // Uneccessary?
     //List<MyPRoom> allRooms;
@@ -93,6 +96,34 @@ public class MyAgent implements Agent
         updateAvailableRooms(cX, cY);
         updateSafeRooms();
 
+        try
+        {
+            String content = "";
+            content += "When player was in position (" + cX + ", " + cY + ") on turn " + ++count + "\nThe ai found following rooms as available ones:\n";
+            for(int i = 0; i < availableRooms.size(); i++)
+            {
+                MyPRoom tmp = availableRooms.get(i);
+                content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
+            }
+
+            if(safeRooms.size() > 0)
+            {
+                content += "It also found theese rooms to be safe.\n";
+
+                for(int i = 0; i < safeRooms.size(); i++)
+                {
+                    MyPRoom tmp = safeRooms.get(i);
+                    content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
+                }
+            }
+            FileWriter wr = new FileWriter("../info.txt");
+            wr.write(content);
+            wr.close();
+        }
+        catch(IOException e)
+        {
+
+        }
         //decide next move
         rnd = decideRandomMove();
         if (rnd==0)
