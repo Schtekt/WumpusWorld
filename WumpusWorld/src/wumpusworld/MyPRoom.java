@@ -7,6 +7,9 @@ public class MyPRoom
 
     private int m_g;
     private int m_f;
+    private boolean m_closed;
+    private MyPRoom m_ParentRoom;
+    private int m_EntranceDirection;
 
     private boolean m_stench;
     private boolean m_breeze;
@@ -21,8 +24,11 @@ public class MyPRoom
         m_x = x;
         m_y = y;
         
-        m_g = -1;
-        m_f = -1;
+        m_g = 0;
+        m_f = 0;
+        m_closed = false;
+        m_ParentRoom = null;
+        m_EntranceDirection = 0;
 
         m_stench = false;
         m_breeze = false;
@@ -101,6 +107,21 @@ public class MyPRoom
         return m_f;
     }
 
+    public boolean isClosed()
+    {
+        return m_closed;
+    }
+
+    public MyPRoom getParentRoom()
+    {
+        return m_ParentRoom;
+    }
+
+    public int getEntranceDirection()
+    {
+        return m_EntranceDirection;
+    }
+
     public void setG(int value)
     {
         m_g = value;
@@ -109,5 +130,29 @@ public class MyPRoom
     public void setF(int value)
     {
         m_f = value;
+    }
+
+    public void setClosed(boolean value)
+    {
+        m_closed = value;
+    }
+
+    public void setParentRoom(MyPRoom room)
+    {
+        m_ParentRoom = room;
+    }
+
+    public void setEntranceDirection(int direction)
+    {
+        m_EntranceDirection = direction;
+    }
+
+    public void resetPath()
+    {
+        m_g = 0;
+        m_f = 0;
+        m_closed = false;
+        m_ParentRoom = null;
+        m_EntranceDirection = 0;
     }
 }

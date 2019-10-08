@@ -31,7 +31,7 @@ public class MyAgent implements Agent
 
         availableRooms = new ArrayList<MyPRoom>();
         safeRooms = new ArrayList<MyPRoom>();
-        //visitedRooms = new ArrayList<MyPRoom>();
+        Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
         //MyPRoom tmp = new MyPRoom(1,1);
@@ -48,7 +48,26 @@ public class MyAgent implements Agent
         //Location of the player
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
+
+        MyPRoom visitedRoom = new MyPRoom(cX, cY);
+        if(!Path.visitedRoomsDeque.contains(visitedRoom))
+        {
+            Path.visitedRoomsDeque.push(visitedRoom);
+        }
         
+        System.out.println("\n");
+        LinkedList<MyPRoom> path = Path.FindPath(w, 1, 2, cX, cY);
+        int roomX = 0;
+        int roomY = 0;
+        MyPRoom room;
+        while (!path.isEmpty())
+        {
+            room = path.pop();
+            roomX = room.getX();
+            roomY = room.getY();
+            System.out.println(roomX + ", " + roomY);
+        }
+
         //Basic action:
         //Grab Gold if we can.
         if (w.hasGlitter(cX, cY))
@@ -408,54 +427,6 @@ public class MyAgent implements Agent
         return tmp;
     }
     
-    /**
-     * calculates the correct direction the player has to face to move into an adjacent room.
-     * calculate relative coordinates by subtracting next location by the current location.
-     * @param relX relative X coordinate. Either 1 or -1 or 0. (next - current)
-     * @param relY relative Y coordinate. Either 1 or -1 or 0. (next - current)
-     * @return the direction the player should face to move towards the next room.
-     */
-    int calcCorrectDirection(int relX, int relY)
-    {
-        /*
-            insätt 1, 0 (detta ska bli 0).
-            abs(1 - 1 + 2*0) = 0
-
-            0,1
-            abs(0-1 + 2*1) = 1
-
-            -1,0
-            abs(-1-1 + 2*0) = 2
-
-            0,-1
-            abs(0-1 + 2*-1) = 3
-        */
-        return Math.abs(relX - 1 + 2*relY);
-    }
-
-    int calcDirectionalCost(int corrDirection, int currDirection)
-    {
-        /*
-        say we input 1 and 3.
-        normalized = 2
-        normalized % 2 = 0.
-        returns 0 + abs(0-1)*2 = 2.
-
-        say we input 2 and 1. (vice versa gives same result)
-        normalized = 1.
-        normalized % 2 = 1.
-        returns 1 + abs(1 - 1)*1 = 1.
-
-        say we input 4 and 4.
-        normalized = 0.
-        normalized % 2 = 0.
-        returns 0 + abs(0 -1) * 0 = 0
-        */
-        int normalized = Math.abs(corrDirection - currDirection);
-
-        return normalized%2 + Math.abs(normalized % 2 - 1)*normalized;
-    }
-
     int calcMoveCost(int playX, int playY, int tarX, int tarY, int currDirection)
     {
         if(w.isValidPosition(playX + 1, playY))
@@ -486,7 +457,6 @@ public class MyAgent implements Agent
     {
       return (int)(Math.random() * 4);
     }
-    
     
 }
 
