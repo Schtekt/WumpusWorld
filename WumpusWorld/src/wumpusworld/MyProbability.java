@@ -6,15 +6,25 @@ public class MyProbability
 {
     private String[][] m_knownData;
 
+    private int m_pitProb[][];
+    private int m_wumpProb[][];
+
     public MyProbability(int sizeOfGrid)
     {
         m_knownData = new String[sizeOfGrid][sizeOfGrid];
+        m_pitProb = new int[sizeOfGrid][sizeOfGrid];
+        m_wumpProb = new int[sizeOfGrid][sizeOfGrid];
 
         for(int i = 0; i < sizeOfGrid; i++)
         {
             for(int j = 0; j < sizeOfGrid; j++)
-            m_knownData[i][j] = World.UNKNOWN;
+            {
+                m_knownData[i][j] = World.UNKNOWN;
+                m_pitProb[i][j] = -1;
+                m_wumpProb[i][j] = -1;
+            }
         }
+
     }
 
     public void setData(String[][] data)
@@ -53,6 +63,8 @@ public class MyProbability
         // Find all positions where a pit COULD be found.
         ArrayList<Coordinate> possiblePits = addPossiblePits();
 
+        ArrayList<Coordinate> possibleWumpus = addPossibleWumpus();
+
         // Generate models for all possible combinations of pits...
         if(possiblePits.size() > 0)
         {
@@ -63,7 +75,7 @@ public class MyProbability
             ArrayList<String[][]> legitModels = new ArrayList<String[][]>();
             for(int i = 0; i < models.size(); i++)
             {
-                if(legitWorld(models.get(i)))
+                if(legitWorldPit(models.get(i)))
                 {
                     legitModels.add(models.get(i));
                 }
@@ -89,15 +101,43 @@ public class MyProbability
                 }
             }
 
-            System.out.println("Gave pits their nrOfs...");
+            System.out.println("Gave pits their occurrence score...");
 
             for(int i = 0; i < possiblePits.size(); i++)
             {
                 Coordinate tmp = possiblePits.get(i);
                 tmp.m_probability =  tmp.m_probability* 100 / legitModels.size();
                 possiblePits.set(i, tmp);
+                m_pitProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
+                //System.out.println("There is a chance of " + tmp.m_probability + "% that there is a pit in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
+            }
+        }
 
-                System.out.println("There is a chance of " + tmp.m_probability + "% that there is a pit in location (" + tmp.m_X + ", " + tmp.m_Y + ")\n");
+        if(possibleWumpus.size() > 0)
+        {
+            ArrayList<Coordinate> legitWump = new ArrayList<Coordinate>();
+            for(int i = 0; i < possibleWumpus.size(); i++)
+            {
+                String[][] tmp = m_knownData;
+                Coordinate tmpCoord = possibleWumpus.get(i);
+                tmp[tmpCoord.m_X][tmpCoord.m_Y] += World.WUMPUS;
+
+                if(legitWorldWump(tmp))
+                {
+                    legitWump.add(tmpCoord);
+                }
+            }
+            possibleWumpus = legitWump;
+
+            for(int i = 0; i < possibleWumpus.size(); i++)
+            {
+                Coordinate tmp = possibleWumpus.get(i);
+
+                tmp.m_probability = 100 / possibleWumpus.size();
+                possibleWumpus.set(i,tmp);
+                m_WumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
+
+                //System.out.println("There is a chance of " + tmp.m_probability + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
     }
@@ -153,7 +193,59 @@ public class MyProbability
         }
         return possiblePits;
     }
-    private boolean legitWorld(String[][] world)
+
+    private ArrayList<Coordinate> addPossibleWumpus()
+    {
+        ArrayList<Coordinate> possibleWumpus = new ArrayList<Coordinate>();
+        for(int i = 0; i < m_knownData.length; i++)
+        {
+            for(int j = 0; j < m_knownData[i].length; j++)
+            {
+                if(m_knownData[i][j].contains(World.STENCH))
+                {
+                    if(i+1 < m_knownData.length && m_knownData[i+1][j].contains(World.UNKNOWN))
+                    {
+                        Coordinate tmp = new Coordinate(i+1, j);
+                        if(!possibleWumpus.contains(tmp))
+                        {
+                            possibleWumpus.add(tmp);
+                        }
+                    }
+
+                    if(i - 1 >= 0 && m_knownData[i-1][j].contains(World.UNKNOWN))
+                    {
+                        Coordinate tmp = new Coordinate(i-1, j);
+
+                        if(!possibleWumpus.contains(tmp))
+                        {
+                            possibleWumpus.add(tmp);
+                        }
+                    }
+
+                    if( j + 1 < m_knownData[i].length && m_knownData[i][j + 1].contains(World.UNKNOWN))
+                    {
+                        Coordinate tmp = new Coordinate(i, j + 1);
+                        if(!possibleWumpus.contains(tmp))
+                        {
+                            possibleWumpus.add(tmp);
+                        }
+                    }
+
+                    if(j - 1 >= 0 && m_knownData[i][j - 1].contains(World.UNKNOWN))
+                    {
+                        Coordinate tmp = new Coordinate(i, j - 1);
+                        if(!possibleWumpus.contains(tmp))
+                        {
+                            possibleWumpus.add(tmp);
+                        }
+                    }
+                }
+            }
+        }
+        return possibleWumpus;
+    }
+    
+    private boolean legitWorldPit(String[][] world)
     {
         for(int i = 0; i < world.length; i++)
         {
@@ -188,28 +280,38 @@ public class MyProbability
                         return false;
                     }
                 }
-                
-                /*
+            }
+        }
+        return true;
+    }
+
+    private boolean legitWorldWump(String[][] world)
+    {
+        for(int i = 0; i < world.length; i++)
+        {
+            for(int j = 0; j < world[i].length; j++)
+            {
                 if(world[i][j].contains(World.STENCH))
                 {
                     boolean res = false;
-
                     if(i + 1 < world.length && world[i + 1][j].contains(World.WUMPUS))
-                    {
+                    {             
                         res = true;
                     }
 
                     if( i - 1 > 0 && world[i - 1][j].contains(World.WUMPUS))
                     {
+                        // There may only be one wumpus!
                         if(res)
                         {
                             return false;
                         }
                         res = true;
                     }
-
+                
                     if( j + 1 < world[i].length && world[i][j + 1].contains(World.WUMPUS))
                     {
+                        // There may only be one wumpus!
                         if(res)
                         {
                             return false;
@@ -219,19 +321,19 @@ public class MyProbability
 
                     if( j - 1 > 0  && world[i][j - 1].contains(World.WUMPUS))
                     {
+                        // There may only be one wumpus!
                         if(res)
                         {
                             return false;
                         }
                         res = true;
                     }
-
+                    
                     if(!res)
                     {
                         return false;
                     }
                 }
-                */
             }
         }
         return true;
@@ -305,5 +407,27 @@ public class MyProbability
             recurPossibleWorlds(models, possiblePits, depth + 1, model, true);
             recurPossibleWorlds(models, possiblePits, depth + 1, model + 1, false);
         }
+    }
+
+    public void getPitProbabilities(int[][] arr)
+    {
+        for(int i = 1; i < arr.length)
+        {
+            for(int j = 1; j < arr[i].length)
+            {
+                arr[i][j] = m_pitProb[i-1][j-1];
+            }
+        }
+    }
+
+    public void getWumpProbabilities(int[][] arr)
+    {
+        for(int i = 1; i < arr.length)
+        {
+            for(int j = 1; j < arr[i].length)
+            {
+                arr[i][j] = m_wumpProb[i-1][j-1];
+            }
+        }   
     }
 }
