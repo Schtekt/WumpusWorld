@@ -5,7 +5,7 @@ import java.util.*;
 
 /**
  * Contains starting code for creating your own Wumpus World agent.
- * Currently the agent only make a random decision each turn.
+ * Currently the agent only makes a random decision each turn.
  * 
  * @author Johan Hagelbäck
  */
@@ -30,6 +30,7 @@ public class MyAgent implements Agent
     public MyAgent(World world)
     {
         w = world;
+        Path.Init(w);
 
         availableRooms = new ArrayList<MyPRoom>();
         safeRooms = new ArrayList<MyPRoom>();
