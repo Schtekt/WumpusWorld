@@ -17,13 +17,6 @@ public class MyProbability
         }
     }
 
-    /*
-    Experiment, låt säga vi har 0,0 ; 0,1 ; 1,0 ; 1,1.
-    0,0 hamnar på index 0.
-    0,1 hamnar på index 1.
-    1,0 hamnar på index 2 (1*längden = 1*2 = 2).
-    1,1 hamnar på index 3 (1*längden + 1 = 1*2 + 1 = 3).
-    */
     public void setData(String[][] data)
     {
         for(int i = 0; i < data.length; i++)
@@ -73,6 +66,10 @@ public class MyProbability
                 if(legitWorld(models.get(i)))
                 {
                     legitModels.add(models.get(i));
+                }
+                else
+                {
+                    System.out.println("Threw model nr " + i + "!");
                 }
             }
 
@@ -124,7 +121,7 @@ public class MyProbability
                         }
                     }
 
-                    if(i - 1 > 0&& m_knownData[i-1][j].contains(World.UNKNOWN))
+                    if(i - 1 >= 0 && m_knownData[i-1][j].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i-1, j);
 
@@ -134,7 +131,7 @@ public class MyProbability
                         }
                     }
 
-                    if( j + 1 < m_knownData[i].length&& m_knownData[i][j + 1].contains(World.UNKNOWN))
+                    if( j + 1 < m_knownData[i].length && m_knownData[i][j + 1].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i, j + 1);
                         if(!possiblePits.contains(tmp))
@@ -143,7 +140,7 @@ public class MyProbability
                         }
                     }
 
-                    if(j - 1 > 0 && m_knownData[i][j - 1].contains(World.UNKNOWN))
+                    if(j - 1 >= 0 && m_knownData[i][j - 1].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i, j - 1);
                         if(!possiblePits.contains(tmp))
@@ -171,7 +168,7 @@ public class MyProbability
                         res = true;
                     }
 
-                    if( i - 1 > 0 && world[i - 1][j].contains(World.PIT))
+                    if( i - 1 >= 0 && world[i - 1][j].contains(World.PIT))
                     {
                         res = true;
                     }
@@ -181,7 +178,7 @@ public class MyProbability
                         res = true;
                     }
 
-                    if( j - 1 > 0  && world[i][j - 1].contains(World.PIT))
+                    if( j - 1 >= 0  && world[i][j - 1].contains(World.PIT))
                     {
                         res = true;
                     }
@@ -250,7 +247,9 @@ public class MyProbability
         {
             for(int j = 0; j < m_knownData[i].length; j++)
             {
-                System.out.print(m_knownData[i][j] + "|");
+                if(m_knownData[j][m_knownData.length - 1 - i] == "")
+                    System.out.print(" ");
+                System.out.print(m_knownData[j][m_knownData.length - 1 - i] + "|");
             }
             System.out.print("\n");
         }
@@ -260,13 +259,18 @@ public class MyProbability
         for(int i = 0; i < models.size(); i++)
         {
             String [][] tmp = models.get(i);
+            System.out.println("Model nr " + i);
             for(int j = 0; j < tmp.length; j++)
             {
-                for(int k = 0; k < tmp[i].length; k++)
+                for(int k = 0; k < tmp[j].length; k++)
                 {
-                    if(tmp[j][k] == "")
+
+                    // rotera med följande matris!
+                    // 0, -1
+                    // 1,  0
+                    if(tmp[k][tmp.length - 1 - j] == "")
                         System.out.print(" ");
-                    System.out.print(tmp[j][k] + "|");
+                    System.out.print(tmp[k][tmp.length - 1 - j] + "|");
                 }
                 System.out.print("\n");
             }
