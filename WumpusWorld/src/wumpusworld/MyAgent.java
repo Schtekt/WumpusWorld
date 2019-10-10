@@ -20,6 +20,8 @@ public class MyAgent implements Agent
     // Uneccessary?
     //List<MyPRoom> allRooms;
     List<MyPRoom> safeRooms;
+
+    MyProbability probBoi;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -34,6 +36,7 @@ public class MyAgent implements Agent
         Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
+        probBoi = new MyProbability(w.getSize());
         //MyPRoom tmp = new MyPRoom(1,1);
         //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
     }
@@ -117,6 +120,19 @@ public class MyAgent implements Agent
         updateAvailableRooms(cX, cY);
         updateSafeRooms();
 
+        String[][] perception = new String[w.getSize()][w.getSize()];
+        for(int i = 1; i <= w.getSize(); i++)
+        {
+            for(int j = 1; j <= w.getSize(); j++)
+            {
+                perception[i-1][j-1] = percieveRoom(i, j);
+            }
+        }
+        System.out.println("Got here!");
+        probBoi.setData(perception);
+        
+        probBoi.calculate();
+        System.out.println("Succeeded in calculations!");
         try
         {
             String content = "";

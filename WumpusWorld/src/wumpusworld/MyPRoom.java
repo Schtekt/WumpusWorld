@@ -16,7 +16,6 @@ public class MyPRoom
     private boolean m_glitter;
     private boolean m_wumpus;
     private boolean m_pit;
-    private boolean m_gold;
     private boolean m_unknown;
 
     public MyPRoom(int x, int y)

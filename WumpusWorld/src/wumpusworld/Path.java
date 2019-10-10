@@ -112,6 +112,7 @@ public class Path
             }
         }
     }
+    
     private static void CheckAdjacent()
     {
         AddToOpen(-1, 0);
@@ -119,6 +120,7 @@ public class Path
         AddToOpen(0, -1);
         AddToOpen(0, 1);
     }
+    
     private static boolean ExploreNextRoom()
     {
         if (m_NrOfRoomsOpen != 0)
@@ -151,6 +153,7 @@ public class Path
 
         return false;
     }
+    
     public static LinkedList<MyPRoom> FindPath(World world, int goalX, int goalY, int startX, int startY)
     {
         for (MyPRoom room : visitedRoomsDeque) {
