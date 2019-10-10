@@ -135,7 +135,7 @@ public class MyProbability
 
                 tmp.m_probability = 100 / possibleWumpus.size();
                 possibleWumpus.set(i,tmp);
-                m_WumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
+                m_wumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
 
                 //System.out.println("There is a chance of " + tmp.m_probability + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
@@ -411,9 +411,9 @@ public class MyProbability
 
     public void getPitProbabilities(int[][] arr)
     {
-        for(int i = 1; i < arr.length)
+        for(int i = 1; i < arr.length; i++)
         {
-            for(int j = 1; j < arr[i].length)
+            for(int j = 1; j < arr[i].length; j++)
             {
                 arr[i][j] = m_pitProb[i-1][j-1];
             }
@@ -422,9 +422,9 @@ public class MyProbability
 
     public void getWumpProbabilities(int[][] arr)
     {
-        for(int i = 1; i < arr.length)
+        for(int i = 1; i < arr.length; i++)
         {
-            for(int j = 1; j < arr[i].length)
+            for(int j = 1; j < arr[i].length; j++)
             {
                 arr[i][j] = m_wumpProb[i-1][j-1];
             }
