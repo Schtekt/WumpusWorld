@@ -96,6 +96,11 @@ public class MyPRoom
         m_wumpus = hasWumpus;
     }
 
+    public void setPit(boolean hasPit)
+    {
+        m_pit = hasPit;
+    }
+
     public int getG()
     {
         return m_g;

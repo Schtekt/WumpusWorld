@@ -60,7 +60,7 @@ public class MyAgent implements Agent
         }
         
         System.out.println("\n");
-        LinkedList<MyPRoom> path = Path.FindPath(w, 1, 2, cX, cY);
+        LinkedList<MyPRoom> path = Path.FindPath(1, 2, cX, cY);
         int roomX = 0;
         int roomY = 0;
         MyPRoom room;
@@ -100,6 +100,7 @@ public class MyAgent implements Agent
         if (w.hasPit(cX, cY))
         {
             System.out.println("I am in a Pit");
+            Path.visitedRoomsDeque.getFirst().setPit(true);
         }
         if (w.getDirection() == World.DIR_RIGHT)
         {
