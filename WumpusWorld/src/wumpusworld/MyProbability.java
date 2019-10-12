@@ -68,7 +68,7 @@ public class MyProbability
         // Generate models for all possible combinations of pits...
         if(possiblePits.size() > 0)
         {
-            System.out.println("Found possiblepits!");
+            System.out.println("Found possible pits!");
             ArrayList<String[][]> models = possibleWorlds(possiblePits);
             System.out.println("Generated models");
             // Throw out any model that disobeys the rules (a model will be removed if there is a breeze without a pit).

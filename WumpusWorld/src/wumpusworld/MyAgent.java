@@ -17,8 +17,6 @@ public class MyAgent implements Agent
     List<MyPRoom> availableRooms;
     LinkedList<MyPRoom> availableRoomsDeque;
     LinkedList<MyPRoom> safeRoomsDeque;
-    // Uneccessary?
-    //List<MyPRoom> allRooms;
     List<MyPRoom> safeRooms;
 
     MyProbability probBoi;
@@ -42,36 +40,67 @@ public class MyAgent implements Agent
         //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
     }
    
+    /**
+     * Tries to move the player to the specified room.
+     * Returns {@code false} if the room is not adjacent
+     * to the current room.
+     * @param x The x coordinate of the target room
+     * @param y The y coordinate of the target room
+     * @return {@code false} if the target room is not adjacent to the current room
+     */
+    public boolean MoveToRoom(MyPRoom room)
+    {
+        //We are in a pit. Climb up.
+        if (w.isInPit())
+        {
+            w.doAction(World.A_CLIMB);
+        }
+        int relX = room.getX() - w.getPlayerX();
+        int relY = room.getY() - w.getPlayerY();
+        if (Math.abs(relX + relY) == 1)
+        {
+            //     0
+            // 3        1
+            //     2
+            int dir = Path.calcCorrectDirection(relX, relY);
+            int turn = w.getDirection() - dir;
+            switch(turn)
+            {
+                case 1:
+                case -3:
+                    w.doAction(World.A_TURN_LEFT);
+                    break;
+                case -1:
+                case 3:
+                    w.doAction(World.A_TURN_RIGHT);
+                    break;
+                case 2:
+                case -2:
+                    w.doAction(World.A_TURN_LEFT);
+                    w.doAction(World.A_TURN_LEFT);
+                    break;
+            }
+            w.doAction(World.A_MOVE);
+            return true;
+        }
+        return false;
+    }
             
     /**
      * Asks your solver agent to execute an action.
      */
-
     public void doAction()
     {
         //Location of the player
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
-
+        
         MyPRoom visitedRoom = new MyPRoom(cX, cY);
         if(!Path.visitedRoomsDeque.contains(visitedRoom))
         {
             Path.visitedRoomsDeque.push(visitedRoom);
         }
         
-        System.out.println("\n");
-        LinkedList<MyPRoom> path = Path.FindPath(1, 2, cX, cY);
-        int roomX = 0;
-        int roomY = 0;
-        MyPRoom room;
-        while (!path.isEmpty())
-        {
-            room = path.pop();
-            roomX = room.getX();
-            roomY = room.getY();
-            System.out.println(roomX + ", " + roomY);
-        }
-
         //Basic action:
         //Grab Gold if we can.
         if (w.hasGlitter(cX, cY))
@@ -80,12 +109,35 @@ public class MyAgent implements Agent
             return;
         }
         
-        //Basic action:
-        //We are in a pit. Climb up.
-        if (w.isInPit())
+        updateAvailableRooms(cX, cY);
+        updateSafeRooms();
+
+        // Select the first room in the safe rooms linked list.
+        // It should be the cheapest one to move to from the 
+        // player's current position
+        MyPRoom goalRoom;
+        if(!safeRoomsDeque.isEmpty())
         {
-            w.doAction(World.A_CLIMB);
-            return;
+            goalRoom = safeRoomsDeque.pop();
+        } 
+        // If there are no safe rooms, move to the next available one
+        else if(!availableRoomsDeque.isEmpty())
+        {
+            goalRoom = availableRoomsDeque.pop();
+        }
+        // If there are no available rooms the game should be over,
+        // this is just a safety measure
+        else
+        {
+            goalRoom = new MyPRoom(cX, cY);
+        }
+
+        // Find path to next room
+        LinkedList<MyPRoom> path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
+        // Loop through the path and move to each room in turn until the goal room is reached
+        while (!path.isEmpty())
+        {
+            MoveToRoom(path.pop());
         }
         
         //Test the environment
@@ -100,7 +152,12 @@ public class MyAgent implements Agent
         if (w.hasPit(cX, cY))
         {
             System.out.println("I am in a Pit");
-            Path.visitedRoomsDeque.getFirst().setPit(true);
+            int index = Path.visitedRoomsDeque.indexOf(visitedRoom);
+            visitedRoom = Path.visitedRoomsDeque.get(index);
+            if(!visitedRoom.hasPit())
+            {
+                visitedRoom.setPit(true);
+            }
         }
         if (w.getDirection() == World.DIR_RIGHT)
         {
@@ -118,9 +175,6 @@ public class MyAgent implements Agent
         {
             System.out.println("I am facing Down");
         }
-        
-        updateAvailableRooms(cX, cY);
-        updateSafeRooms();
 
         String[][] perception = new String[w.getSize()][w.getSize()];
         for(int i = 1; i <= w.getSize(); i++)
@@ -138,7 +192,7 @@ public class MyAgent implements Agent
         try
         {
             String content = "";
-            content += "When player was in position (" + cX + ", " + cY + ") and turned to " + w.getDirection() + " on turn " + ++count + "\nThe ai found following rooms as available ones:\n";
+            content += "When player was in position (" + cX + ", " + cY + ") and turned to " + w.getDirection() + " on turn " + ++count + "\nThe ai found the following rooms as available ones:\n";
             for(int i = 0; i < availableRoomsDeque.size(); i++)
             {
                 MyPRoom tmp = availableRoomsDeque.get(i);
@@ -162,85 +216,9 @@ public class MyAgent implements Agent
         catch(IOException e)
         {
 
-        }
-        //decide next move
-        rnd = decideRandomMove();
-        if (rnd==0)
-        {
-            w.doAction(World.A_TURN_LEFT);
-            w.doAction(World.A_MOVE);
-        }
-        
-        if (rnd==1)
-        {
-            w.doAction(World.A_MOVE);
-        }
-                
-        if (rnd==2)
-        {
-            w.doAction(World.A_TURN_LEFT);
-            w.doAction(World.A_TURN_LEFT);
-            w.doAction(World.A_MOVE);
-        }
-                        
-        if (rnd==3)
-        {
-            w.doAction(World.A_TURN_RIGHT);
-            w.doAction(World.A_MOVE);
-        }
-                
-    }    
-    //based on uneccesary system.
-    /*void addAvailableRooms(int playerX, int playerY)
-    {
-        MyPRoom tmpe = allRooms.get((playerX - 1)*4 + playerY - 1);
-        System.out.println(tmpe.getX() + ", " + tmpe.getY());
+        }                
+    }
 
-        if(w.isValidPosition(playerX + 1, playerY))
-        {
-            MyPRoom tmp = allRooms.get((((playerX)*4) + playerY - 1));
-
-            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
-            {
-                availableRooms.add(tmp);
-                System.out.println("Added room!" + (tmp.getX()) + ", " + tmp.getY());
-            }
-        }
-
-        if(w.isValidPosition(playerX - 1, playerY))
-        {
-            MyPRoom tmp = allRooms.get(((playerX - 2)*4 + playerY - 1));
-
-            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
-            {
-                availableRooms.add(tmp);
-                System.out.println("Added room!" + (tmp.getX()) + ", " + tmp.getY());
-            }
-        }
-
-        if(w.isValidPosition(playerX, playerY + 1))
-        {
-            MyPRoom tmp = allRooms.get(((playerX - 1)*4 + (playerY)));
-
-            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
-            {
-                availableRooms.add(tmp);
-                System.out.println("Added room!" + tmp.getX() + ", " + (tmp.getY()));
-            }
-        }
-
-        if(w.isValidPosition(playerX, playerY - 1))
-        {
-            MyPRoom tmp = allRooms.get(((playerX - 1)*4 + (playerY - 2)));
-
-            if(!availableRooms.contains(tmp) && tmp.getPerception() == World.UNKNOWN)
-            {
-                availableRooms.add(tmp);
-                System.out.println("Added room!" + tmp.getX() + ", " + (tmp.getY()));
-            }
-        }
-    }*/
-    
     void addAvailableRooms(int playerX, int playerY)
     {
         int x = playerX + (w.getDirection() -2)%2;
@@ -368,7 +346,7 @@ public class MyAgent implements Agent
             }
         }
 
-        for(int i = 0; i < availableRoomsDeque.size(); i++)
+        for(int i = availableRoomsDeque.size() - 1; i >= 0; i--)
         {
             MyPRoom tmp = availableRoomsDeque.get(i);
             int x = tmp.getX();
@@ -376,7 +354,7 @@ public class MyAgent implements Agent
 
             if(pitNo(x,y) && wumpNo(x,y) && !safeRoomsDeque.contains(tmp))
             {
-                safeRoomsDeque.add(tmp);
+                safeRoomsDeque.push(tmp);
             }
         }
 

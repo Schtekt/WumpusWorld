@@ -78,7 +78,7 @@ public class Path
     public static int calcCorrectDirection(int relX, int relY)
     {
         /*
-            insätt 0, 1 (detta ska bli 0).
+            Input 0, 1 (this should become 0).
             abs(2*0 + 1 - 1) = 0
 
             1,0
