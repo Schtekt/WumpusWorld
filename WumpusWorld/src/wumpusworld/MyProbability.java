@@ -1,6 +1,6 @@
 package wumpusworld;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class MyProbability
 {
@@ -42,7 +42,8 @@ public class MyProbability
     {
         public int m_X;
         public int m_Y;
-        public int m_probability;
+        public int m_probabilityPit;
+        public int m_probabilityWump;
         public Coordinate(int x, int y)
         {
             m_X = x;
@@ -58,7 +59,7 @@ public class MyProbability
         }
     }
 
-    public void calculate()
+    public void calculate(List<MyPRoom> availableRooms)
     {
         // Find all positions where a pit COULD be found.
         ArrayList<Coordinate> possiblePits = addPossiblePits();
@@ -68,9 +69,9 @@ public class MyProbability
         // Generate models for all possible combinations of pits...
         if(possiblePits.size() > 0)
         {
-            System.out.println("Found possible pits!");
+            //System.out.println("Found possible pits!");
             ArrayList<String[][]> models = possibleWorlds(possiblePits);
-            System.out.println("Generated models");
+            //System.out.println("Generated models");
             // Throw out any model that disobeys the rules (a model will be removed if there is a breeze without a pit).
             ArrayList<String[][]> legitModels = new ArrayList<String[][]>();
             for(int i = 0; i < models.size(); i++)
@@ -79,13 +80,7 @@ public class MyProbability
                 {
                     legitModels.add(models.get(i));
                 }
-                else
-                {
-                    System.out.println("Threw model nr " + i + "!");
-                }
             }
-
-            System.out.println("Threw out false models");
 
             //NOW we can calculate...
             for(int i = 0; i < legitModels.size(); i++)
@@ -95,20 +90,18 @@ public class MyProbability
                 for(int j = 0; j < possiblePits.size(); j++)
                 {
                     Coordinate coord = possiblePits.get(j);
-                    coord.m_probability += tmp[coord.m_X][coord.m_Y].contains(World.PIT) ? 1:0;
+                    coord.m_probabilityPit += tmp[coord.m_X][coord.m_Y].contains(World.PIT) ? 1:0;
 
                     possiblePits.set(j, coord);
                 }
             }
 
-            System.out.println("Gave pits their occurrence score...");
-
             for(int i = 0; i < possiblePits.size(); i++)
             {
                 Coordinate tmp = possiblePits.get(i);
-                tmp.m_probability =  tmp.m_probability* 100 / legitModels.size();
+                tmp.m_probabilityPit =  tmp.m_probabilityPit* 100 / legitModels.size();
                 possiblePits.set(i, tmp);
-                m_pitProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
+                m_pitProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityPit;
                 //System.out.println("There is a chance of " + tmp.m_probability + "% that there is a pit in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
@@ -116,15 +109,27 @@ public class MyProbability
         if(possibleWumpus.size() > 0)
         {
             ArrayList<Coordinate> legitWump = new ArrayList<Coordinate>();
+            System.out.println(possibleWumpus.size());
             for(int i = 0; i < possibleWumpus.size(); i++)
             {
-                String[][] tmp = m_knownData;
+                String[][] tmp = new String[m_knownData.length][m_knownData.length];
+                for (int j = 0; j < m_knownData.length; j++)
+                {
+                    for (int k = 0; k < m_knownData.length; k++)
+                    {
+                        tmp[j][k] = m_knownData[j][k];
+                    }
+                }
                 Coordinate tmpCoord = possibleWumpus.get(i);
-                tmp[tmpCoord.m_X][tmpCoord.m_Y] += World.WUMPUS;
+                tmp[tmpCoord.m_X][tmpCoord.m_Y] = World.WUMPUS;
 
                 if(legitWorldWump(tmp))
                 {
                     legitWump.add(tmpCoord);
+                }
+                else
+                {
+                    System.out.println("Threw wump! " + i);
                 }
             }
             possibleWumpus = legitWump;
@@ -133,11 +138,25 @@ public class MyProbability
             {
                 Coordinate tmp = possibleWumpus.get(i);
 
-                tmp.m_probability = 100 / possibleWumpus.size();
+                tmp.m_probabilityWump = 100 / possibleWumpus.size();
                 possibleWumpus.set(i,tmp);
-                m_wumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probability;
+                m_wumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityWump;
 
                 //System.out.println("There is a chance of " + tmp.m_probability + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
+            }
+        }
+        
+        for(int i = 0; i < availableRooms.size(); i++)
+        {
+            MyPRoom tmpRoom = availableRooms.get(i);
+            if(m_pitProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] == -1)
+            {
+                m_pitProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] = 0;
+            }
+
+            if(m_wumpProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] == -1)
+            {
+                m_wumpProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] = 0;
             }
         }
     }
@@ -295,15 +314,17 @@ public class MyProbability
                 {
                     boolean res = false;
                     if(i + 1 < world.length && world[i + 1][j].contains(World.WUMPUS))
-                    {             
+                    {
+                        System.out.println("Found a wump right");
                         res = true;
                     }
 
-                    if( i - 1 > 0 && world[i - 1][j].contains(World.WUMPUS))
+                    if(i - 1 >= 0 && world[i - 1][j].contains(World.WUMPUS))
                     {
                         // There may only be one wumpus!
                         if(res)
                         {
+                            System.out.println("Found a false wump left");
                             return false;
                         }
                         res = true;
@@ -314,16 +335,18 @@ public class MyProbability
                         // There may only be one wumpus!
                         if(res)
                         {
+                            System.out.println("Found a false wump up");
                             return false;
                         }
                         res = true;
                     }
 
-                    if( j - 1 > 0  && world[i][j - 1].contains(World.WUMPUS))
+                    if( j - 1 >= 0  && world[i][j - 1].contains(World.WUMPUS))
                     {
                         // There may only be one wumpus!
                         if(res)
                         {
+                            System.out.println("Found a false wump down");
                             return false;
                         }
                         res = true;
@@ -345,7 +368,7 @@ public class MyProbability
         models = new ArrayList<String[][]>();
         models.add(m_knownData);
 
-        for(int i = 0; i < m_knownData.length; i++)
+        /*for(int i = 0; i < m_knownData.length; i++)
         {
             for(int j = 0; j < m_knownData[i].length; j++)
             {
@@ -354,11 +377,11 @@ public class MyProbability
                 System.out.print(m_knownData[j][m_knownData.length - 1 - i] + "|");
             }
             System.out.print("\n");
-        }
+        }*/
 
-        System.out.println("Generated first model...");
+        //System.out.println("Generated first model...");
         recurPossibleWorlds(models, possiblePits, 0, 0, true);
-        for(int i = 0; i < models.size(); i++)
+        /*for(int i = 0; i < models.size(); i++)
         {
             String [][] tmp = models.get(i);
             System.out.println("Model nr " + i);
@@ -377,7 +400,7 @@ public class MyProbability
                 System.out.print("\n");
             }
             System.out.println("__________________");
-        }
+        }*/
         return models;
     }
 
@@ -429,5 +452,36 @@ public class MyProbability
                 arr[i][j] = m_wumpProb[i-1][j-1];
             }
         }   
+    }
+
+    public Coordinate getSafestCoordinates(List<MyPRoom> rooms)
+    {
+        int bestWump = 100;
+        int bestPit = 100;
+        Coordinate toReturn = null;
+
+        for(int i = 0; i < rooms.size(); i++)
+        {
+            MyPRoom tmp = rooms.get(i);
+            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
+            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
+
+            if(m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump || toReturn == null)
+            {
+                toReturn = new Coordinate(tmp.getX(), tmp.getY());
+                bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
+                bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+            }
+            else if(m_pitProb[tmp.getX() - 1][tmp.getY() - 1] < bestPit && m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] <= bestWump)
+            {
+                System.out.println("switching from (" + toReturn.m_X + ", " + toReturn.m_Y + ")" + " to (" + tmp.getX() + ", " + tmp.getY() + ")");
+                toReturn = new Coordinate(tmp.getX(), tmp.getY());
+                bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
+                bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+            }
+        }
+
+        System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y);
+        return toReturn;
     }
 }

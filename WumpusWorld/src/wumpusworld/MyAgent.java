@@ -3,6 +3,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import wumpusworld.MyProbability.Coordinate;
+
 /**
  * Contains starting code for creating your own Wumpus World agent.
  * Currently the agent only makes a random decision each turn.
@@ -19,7 +21,7 @@ public class MyAgent implements Agent
     LinkedList<MyPRoom> safeRoomsDeque;
     List<MyPRoom> safeRooms;
 
-    MyProbability probBoi;
+    MyProbability probCalc;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -35,7 +37,7 @@ public class MyAgent implements Agent
         Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
-        probBoi = new MyProbability(w.getSize());
+        probCalc = new MyProbability(w.getSize());
         //MyPRoom tmp = new MyPRoom(1,1);
         //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
     }
@@ -122,7 +124,35 @@ public class MyAgent implements Agent
         // If there are no safe rooms, move to the next available one
         else if(!availableRoomsDeque.isEmpty())
         {
-            goalRoom = availableRoomsDeque.pop();
+            String[][] perception = new String[w.getSize()][w.getSize()];
+            for(int i = 1; i <= w.getSize(); i++)
+            {
+                for(int j = 1; j <= w.getSize(); j++)
+                {
+                    perception[i-1][j-1] = percieveRoom(i, j);
+                }
+            }
+
+            probCalc.setData(perception);
+            
+            probCalc.calculate(availableRoomsDeque);
+
+            Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
+            MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
+
+            if(room.m_probabilityWump == 100)
+            {
+                // check for other rooms, we now know where the wumpus is...
+
+                // LEGOLAS DAT BOI!
+            }
+
+            if(availableRooms.contains(tmp))
+            {
+                availableRooms.remove(tmp);
+            }
+            
+            goalRoom = tmp;
         }
         // If there are no available rooms the game should be over,
         // this is just a safety measure
@@ -175,19 +205,7 @@ public class MyAgent implements Agent
             System.out.println("I am facing Down");
         }
 
-        String[][] perception = new String[w.getSize()][w.getSize()];
-        for(int i = 1; i <= w.getSize(); i++)
-        {
-            for(int j = 1; j <= w.getSize(); j++)
-            {
-                perception[i-1][j-1] = percieveRoom(i, j);
-            }
-        }
-        System.out.println("Got here!");
-        probBoi.setData(perception);
-        
-        probBoi.calculate();
-        System.out.println("Succeeded in calculations!");
+
         try
         {
             String content = "";
@@ -222,6 +240,7 @@ public class MyAgent implements Agent
     {
         int x = playerX + (w.getDirection() -2)%2;
         int y = playerY + (w.getDirection() - 1) % 2;
+
         if(w.isValidPosition(x, y) && !w.isVisited(x, y))
         {
             MyPRoom tmp = new MyPRoom(x, y);
@@ -354,6 +373,7 @@ public class MyAgent implements Agent
             if(pitNo(x,y) && wumpNo(x,y) && !safeRoomsDeque.contains(tmp))
             {
                 safeRoomsDeque.push(tmp);
+                System.out.println("Added room (" + x + "," + y + ") to safe rooms.");
             }
         }
 
@@ -377,10 +397,10 @@ public class MyAgent implements Agent
 
     boolean wumpNo(int x, int y)
     {
-        return     w.isValidPosition(x + 1, y) && w.isValidPosition(x + 1, y) && !w.hasStench(x + 1, y) && !w.isUnknown(x + 1, y)
-                || w.isValidPosition(x - 1, y) && w.isValidPosition(x - 1, y) && !w.hasStench(x - 1, y) && !w.isUnknown(x - 1, y)
-                || w.isValidPosition(x, y + 1) && w.isValidPosition(x, y + 1) && !w.hasStench(x, y + 1) && !w.isUnknown(x, y + 1)
-                || w.isValidPosition(x, y - 1) && w.isValidPosition(x, y - 1) && !w.hasStench(x, y - 1) && !w.isUnknown(x, y - 1);
+        return     w.isValidPosition(x + 1, y) && !w.hasStench(x + 1, y) && !w.isUnknown(x + 1, y)
+                || w.isValidPosition(x - 1, y) && !w.hasStench(x - 1, y) && !w.isUnknown(x - 1, y)
+                || w.isValidPosition(x, y + 1) && !w.hasStench(x, y + 1) && !w.isUnknown(x, y + 1)
+                || w.isValidPosition(x, y - 1) && !w.hasStench(x, y - 1) && !w.isUnknown(x, y - 1);
     }
     
     String percieveRoom(int x, int y)
