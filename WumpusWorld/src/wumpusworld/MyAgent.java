@@ -166,11 +166,6 @@ public class MyAgent implements Agent
                     System.out.println("Kill the wumpus!");
                 }
                 
-                if(availableRoomsDeque.contains(tmp))
-                {
-                    availableRoomsDeque.remove(tmp);
-                }
-                
                 goalRoom = tmp;
 
                 if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && !otherSideOfPit.isEmpty())
@@ -178,12 +173,15 @@ public class MyAgent implements Agent
                     maybeWump = true;
                     goalRoom = otherSideOfPit.pop();
                 }
+                else if(availableRoomsDeque.contains(tmp))
+                {
+                    availableRoomsDeque.remove(tmp);
+                }
             }
             else
             {
                 goalRoom = new MyPRoom(cX, cY);
             }
-
 
             // Find path to next room
             path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
@@ -276,8 +274,11 @@ public class MyAgent implements Agent
         if(w.isValidPosition(x, y) && !w.isVisited(x, y))
         {
             MyPRoom tmp = new MyPRoom(x, y);
-            if(!availableRoomsDeque.contains(tmp))
-                availableRoomsDeque.push(tmp);
+            if(availableRoomsDeque.contains(tmp))
+            {
+                availableRoomsDeque.remove(tmp);
+            }
+            availableRoomsDeque.push(tmp);
         }
 
         x = playerX + (w.getDirection() - 1) % 2;
@@ -285,8 +286,11 @@ public class MyAgent implements Agent
         if(w.isValidPosition(x, y) && !w.isVisited(x, y))
         {
             MyPRoom tmp = new MyPRoom(x, y);
-            if(!availableRoomsDeque.contains(tmp))
-                availableRoomsDeque.push(tmp);
+            if(availableRoomsDeque.contains(tmp))
+            {
+                availableRoomsDeque.remove(tmp);
+            }
+            availableRoomsDeque.push(tmp);
         }
 
         x = playerX + (1 - w.getDirection()) % 2;        
@@ -294,8 +298,11 @@ public class MyAgent implements Agent
         if(w.isValidPosition(x, y) && !w.isVisited(x, y))
         {
             MyPRoom tmp = new MyPRoom(x, y);
-            if(!availableRoomsDeque.contains(tmp))
-                availableRoomsDeque.push(tmp);
+            if(availableRoomsDeque.contains(tmp))
+            {
+                availableRoomsDeque.remove(tmp);
+            }
+            availableRoomsDeque.push(tmp);
         }
 
         x = playerX + (2 - w.getDirection()) % 2;
@@ -303,8 +310,11 @@ public class MyAgent implements Agent
         if(w.isValidPosition(x, y) && !w.isVisited(x, y))
         {
             MyPRoom tmp = new MyPRoom(x, y);
-            if(!availableRoomsDeque.contains(tmp))
-                availableRoomsDeque.push(tmp);
+            if(availableRoomsDeque.contains(tmp))
+            {
+                availableRoomsDeque.remove(tmp);
+            }
+            availableRoomsDeque.push(tmp);
         }
 
         if(w.isValidPosition(playerX + 1, playerY) && !w.isVisited(playerX + 1, playerY))
@@ -402,8 +412,12 @@ public class MyAgent implements Agent
             int x = tmp.getX();
             int y = tmp.getY();
 
-            if(pitNo(x,y) && wumpNo(x,y) && !safeRoomsDeque.contains(tmp))
+            if(pitNo(x,y) && wumpNo(x,y))
             {
+                if(safeRoomsDeque.contains(tmp))
+                {
+                    safeRoomsDeque.remove(tmp);
+                }
                 safeRoomsDeque.push(tmp);
                 System.out.println("Added room (" + x + "," + y + ") to safe rooms.");
             }
