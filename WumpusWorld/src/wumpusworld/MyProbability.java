@@ -439,8 +439,9 @@ public class MyProbability
                         else
                         {
                             System.out.println("There is no wump in (" + wumpX + ", " + wumpY + ")");
+                            return false;
                         }
-                        return unknownUp && unknownRight && unknownDown && unknownLeft;
+                        //return unknownUp && unknownRight && unknownDown && unknownLeft;
 
                     }
                 }
