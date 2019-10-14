@@ -109,7 +109,7 @@ public class MyProbability
         if(possibleWumpus.size() > 0)
         {
             ArrayList<Coordinate> legitWump = new ArrayList<Coordinate>();
-            System.out.println(possibleWumpus.size());
+            // System.out.println(possibleWumpus.size());
             for(int i = 0; i < possibleWumpus.size(); i++)
             {
                 String[][] tmp = new String[m_knownData.length][m_knownData.length];
@@ -129,7 +129,7 @@ public class MyProbability
                 }
                 else
                 {
-                    System.out.println("Threw wump! " + i);
+                    // System.out.println("Threw wump! " + i);
                 }
             }
             possibleWumpus = legitWump;
@@ -315,7 +315,6 @@ public class MyProbability
                     boolean res = false;
                     if(i + 1 < world.length && world[i + 1][j].contains(World.WUMPUS))
                     {
-                        System.out.println("Found a wump right");
                         res = true;
                     }
 
@@ -324,7 +323,6 @@ public class MyProbability
                         // There may only be one wumpus!
                         if(res)
                         {
-                            System.out.println("Found a false wump left");
                             return false;
                         }
                         res = true;
@@ -335,7 +333,6 @@ public class MyProbability
                         // There may only be one wumpus!
                         if(res)
                         {
-                            System.out.println("Found a false wump up");
                             return false;
                         }
                         res = true;
@@ -346,7 +343,6 @@ public class MyProbability
                         // There may only be one wumpus!
                         if(res)
                         {
-                            System.out.println("Found a false wump down");
                             return false;
                         }
                         res = true;
@@ -463,25 +459,29 @@ public class MyProbability
         for(int i = 0; i < rooms.size(); i++)
         {
             MyPRoom tmp = rooms.get(i);
-            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
-            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
+            // System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
+            // System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
 
             if(m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump || toReturn == null)
             {
                 toReturn = new Coordinate(tmp.getX(), tmp.getY());
                 bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
                 bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+                toReturn.m_probabilityWump = bestWump;
+                toReturn.m_probabilityPit = bestPit;
             }
             else if(m_pitProb[tmp.getX() - 1][tmp.getY() - 1] < bestPit && m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] <= bestWump)
             {
-                System.out.println("switching from (" + toReturn.m_X + ", " + toReturn.m_Y + ")" + " to (" + tmp.getX() + ", " + tmp.getY() + ")");
+                // System.out.println("switching from (" + toReturn.m_X + ", " + toReturn.m_Y + ")" + " to (" + tmp.getX() + ", " + tmp.getY() + ")");
                 toReturn = new Coordinate(tmp.getX(), tmp.getY());
                 bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
                 bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+                toReturn.m_probabilityWump = bestWump;
+                toReturn.m_probabilityPit = bestPit;
             }
         }
 
-        System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y);
+        // System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y);
         return toReturn;
     }
 }

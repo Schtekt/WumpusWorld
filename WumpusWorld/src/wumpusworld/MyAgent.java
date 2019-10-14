@@ -20,6 +20,9 @@ public class MyAgent implements Agent
     LinkedList<MyPRoom> availableRoomsDeque;
     LinkedList<MyPRoom> safeRoomsDeque;
     List<MyPRoom> safeRooms;
+    LinkedList<MyPRoom> path;
+    LinkedList<MyPRoom> otherSideOfPit;
+    boolean killWump;
 
     MyProbability probCalc;
     /**
@@ -37,6 +40,10 @@ public class MyAgent implements Agent
         Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
+        path = new LinkedList<MyPRoom>();
+        otherSideOfPit = new LinkedList<MyPRoom>();
+        killWump = false;
+
         probCalc = new MyProbability(w.getSize());
         //MyPRoom tmp = new MyPRoom(1,1);
         //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
@@ -47,9 +54,10 @@ public class MyAgent implements Agent
      * Returns {@code false} if the room is not adjacent
      * to the current room.
      * @param room The room to which the player should move
+     * @param goal The goal of the path
      * @return {@code false} if the target room is not adjacent to the current room
      */
-    public boolean MoveToRoom(MyPRoom room)
+    public boolean MoveToRoom(MyPRoom room, MyPRoom goal)
     {
         //We are in a pit. Climb up.
         if (w.isInPit())
@@ -80,6 +88,11 @@ public class MyAgent implements Agent
                     w.doAction(World.A_TURN_LEFT);
                     w.doAction(World.A_TURN_LEFT);
                     break;
+            }
+            if (killWump && room.equals(goal))
+            {
+                System.out.println("SHOOT");
+                w.doAction(World.A_SHOOT);
             }
             w.doAction(World.A_MOVE);
             return true;
@@ -117,12 +130,7 @@ public class MyAgent implements Agent
         // It should be the cheapest one to move to from the 
         // player's current position
         MyPRoom goalRoom;
-        if(!safeRoomsDeque.isEmpty())
-        {
-            goalRoom = safeRoomsDeque.pop();
-        } 
-        // If there are no safe rooms, move to the next available one
-        else if(!availableRoomsDeque.isEmpty())
+        if(safeRoomsDeque.isEmpty() && !availableRoomsDeque.isEmpty())
         {
             String[][] perception = new String[w.getSize()][w.getSize()];
             for(int i = 1; i <= w.getSize(); i++)
@@ -136,37 +144,61 @@ public class MyAgent implements Agent
             probCalc.setData(perception);
             
             probCalc.calculate(availableRoomsDeque);
-
-            Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
-            MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
-
-            if(room.m_probabilityWump == 100)
+        }
+        otherSideOfPit.clear();
+        boolean maybeWump = false;
+        do {
+            killWump = false;
+            if(!safeRoomsDeque.isEmpty())
             {
-                // check for other rooms, we now know where the wumpus is...
+                goalRoom = safeRoomsDeque.pop();
+                availableRoomsDeque.remove(goalRoom);
+            }
+            else if(!availableRoomsDeque.isEmpty())
+            {
+                Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
+                MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
+                
+                System.out.println("Prob wump: " + room.m_probabilityWump);
+                if(room.m_probabilityWump == 100)
+                {
+                    killWump = true;
+                    System.out.println("Kill the wumpus!");
+                }
+                
+                if(availableRoomsDeque.contains(tmp))
+                {
+                    availableRoomsDeque.remove(tmp);
+                }
+                
+                goalRoom = tmp;
 
-                // LEGOLAS DAT BOI!
+                if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && !otherSideOfPit.isEmpty())
+                {
+                    maybeWump = true;
+                    goalRoom = otherSideOfPit.pop();
+                }
+            }
+            else
+            {
+                goalRoom = new MyPRoom(cX, cY);
             }
 
-            if(availableRooms.contains(tmp))
-            {
-                availableRooms.remove(tmp);
-            }
-            
-            goalRoom = tmp;
-        }
-        // If there are no available rooms the game should be over,
-        // this is just a safety measure
-        else
-        {
-            goalRoom = new MyPRoom(cX, cY);
-        }
 
-        // Find path to next room
-        LinkedList<MyPRoom> path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
+            // Find path to next room
+            path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
+            if(Path.m_Pit)
+            {
+                System.out.println("The path has a pit");
+                otherSideOfPit.add(goalRoom);
+            }
+
+        }while (Path.m_Pit && !maybeWump);
+
         // Loop through the path and move to each room in turn until the goal room is reached
         while (!path.isEmpty())
         {
-            MoveToRoom(path.pop());
+            MoveToRoom(path.pop(), goalRoom);
         }
         
         //Test the environment
