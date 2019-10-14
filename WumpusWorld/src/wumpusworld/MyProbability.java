@@ -59,6 +59,12 @@ public class MyProbability
         }
     }
 
+    /**
+     * calculates the probabilities of the existence of wumpus and/or 
+     * pits of all locations in the world set with the method setData(String[][] data).
+     * The probabilities are dependent of the perceptions.
+     * @param availableRooms rooms that should get values. Any room that isn't adjacent to a stench or breeze AND is not present in the param will get a -1 as value.
+     */
     public void calculate(List<MyPRoom> availableRooms)
     {
         // Find all positions where a pit COULD be found.
@@ -161,6 +167,11 @@ public class MyProbability
         }
     }
 
+    /**
+     * A function that gives out all possible positions for pits.
+     * No logic involved, any unkown area in the known data could contain a pit.
+     * @return an ArrayList<Coordinate> of all possible pit locations.
+     */
     private ArrayList<Coordinate> addPossiblePits()
     {
         ArrayList<Coordinate> possiblePits = new ArrayList<Coordinate>();
@@ -213,6 +224,11 @@ public class MyProbability
         return possiblePits;
     }
 
+    /**
+     * A function that gives out all possible positions for the wumpus.
+     * No logic involved, any unkown area in the known data could contain a wumpus.
+     * @return an ArrayList<Coordinate> of all possible locations for a Wumpus.
+     */
     private ArrayList<Coordinate> addPossibleWumpus()
     {
         ArrayList<Coordinate> possibleWumpus = new ArrayList<Coordinate>();
@@ -264,6 +280,12 @@ public class MyProbability
         return possibleWumpus;
     }
     
+    /**
+     * Checks if the given world is satisfiable. 
+     * If the world follows the rule that all breezes must be adjacent to atleast one pit, returns true.
+     * @param world model of the world that is to be tested.
+     * @return true if the world is satisfiable with regard to breezes.
+     */
     private boolean legitWorldPit(String[][] world)
     {
         for(int i = 0; i < world.length; i++)
@@ -304,6 +326,12 @@ public class MyProbability
         return true;
     }
 
+    /**
+     * Checks if the given world is satisfiable. 
+     * If the world follows the rule that all stenches must be adjacent to one wumpus.
+     * @param world model of the world that is to be tested.
+     * @return true if the world is satisfiable with regard to stenches AND that there only may be one wumpus.
+     */
     private boolean legitWorldWump(String[][] world)
     {
         for(int i = 0; i < world.length; i++)
@@ -421,6 +449,12 @@ public class MyProbability
         return true;
     }
 
+    /**
+     * Used to generate all possible worlds (without using logic!) to get all combinations of pits.
+     * this is done by going through the list of the pits and setting them up to either exist or not, making a tree of models.
+     * @param possiblePits list of positions where a pit might appear.
+     * @return an ArrayList of all possible models given possible positions of pits
+     */
     private ArrayList<String[][]> possibleWorlds(ArrayList<Coordinate> possiblePits)
     {
         ArrayList<String[][]> models;
@@ -463,6 +497,14 @@ public class MyProbability
         return models;
     }
 
+    /**
+     * helping recursive method to possibleWorlds. 
+     * @param models
+     * @param possiblePits
+     * @param depth
+     * @param model
+     * @param setPit
+     */
     private void recurPossibleWorlds(ArrayList<String[][]> models, ArrayList<Coordinate> possiblePits, int depth, int model, boolean setPit)
     {
         Coordinate tmp = possiblePits.get(depth);
