@@ -84,13 +84,12 @@ public class GUI implements ActionListener
         l_my_pit = new ImageIcon("gfx/Pit.png");
         l_my_glitter = new ImageIcon("gfx/Gold.gif");
         l_my_wumpus = new ImageIcon("gfx/Wumpus.gif");
-        l_my_player_up = new ImageIcon("gfx/PU.png");
-        l_my_player_down = new ImageIcon("gfx/PD.png");
-        l_my_player_left = new ImageIcon("gfx/PL.png");
-        l_my_player_right = new ImageIcon("gfx/PR.png");
+        l_my_player_up = new ImageIcon("gfx/PlayerUp.png");
+        l_my_player_down = new ImageIcon("gfx/PlayerDown.png");
+        l_my_player_left = new ImageIcon("gfx/PlayerLeft.png");
+        l_my_player_right = new ImageIcon("gfx/PlayerRight.png");
 
         bg = new ImageIcon("gfx/background.png");
-        // bg = new ImageIcon("gfx/background2.png");
         uk = new ImageIcon("gfx/unknown.png");
 
         createWindow();
@@ -123,6 +122,25 @@ public class GUI implements ActionListener
             f = new File("gfx/PL.png");
             if (!f.exists()) return false;
             f = new File("gfx/PR.png");
+            if (!f.exists()) return false;
+            
+            f = new File("gfx/Breeze.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/Stench.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/Pit.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/Gold.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/Wumpus.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/PlayerUp.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/PlayerDown.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/PlayerLeft.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/PlayerRight.png");
             if (!f.exists()) return false;
         }
         catch (Exception ex)
