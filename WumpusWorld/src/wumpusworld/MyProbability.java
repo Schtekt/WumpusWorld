@@ -108,14 +108,13 @@ public class MyProbability
                 tmp.m_probabilityPit =  tmp.m_probabilityPit* 100 / legitModels.size();
                 possiblePits.set(i, tmp);
                 m_pitProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityPit;
-                System.out.println("There is a chance of " + tmp.m_probabilityPit + "% that there is a pit in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
+                //System.out.println("There is a chance of " + tmp.m_probabilityPit + "% that there is a pit in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
 
         if(possibleWumpus.size() > 0)
         {
             ArrayList<Coordinate> legitWump = new ArrayList<Coordinate>();
-            System.out.println("possibleWumps: " + possibleWumpus.size());
             for(int i = 0; i < possibleWumpus.size(); i++)
             {
                 String[][] tmp = new String[m_knownData.length][m_knownData.length];
@@ -148,7 +147,7 @@ public class MyProbability
                 possibleWumpus.set(i,tmp);
                 m_wumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityWump;
 
-                System.out.println("There is a chance of " + tmp.m_probabilityWump + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
+                //System.out.println("There is a chance of " + tmp.m_probabilityWump + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
         
@@ -397,52 +396,25 @@ public class MyProbability
                         unknownUp = unknownRight = unknownDown = unknownLeft = true;
                         if (wumpY + 1 < world.length)
                         {
-                            System.out.println("Checking up");
                             unknownUp = world[wumpX][wumpY + 1].contains(World.UNKNOWN) || world[wumpX][wumpY + 1].contains(World.STENCH);
-                            if(!unknownUp)
-                            {
-                                System.out.println("FAIL!");
-                            }
                         }
                         if (wumpX + 1 < world.length)
                         {
-                            System.out.println("Checking right");
                             unknownRight = world[wumpX + 1][wumpY].contains(World.UNKNOWN) || world[wumpX + 1][wumpY].contains(World.STENCH);
-                            if(!unknownRight)
-                            {
-                                System.out.println("FAIL!");
-                            }
                         }
                         if (wumpY - 1 >= 0)
                         {
-                            System.out.println("Checking down");
                             unknownDown = world[wumpX][wumpY - 1].contains(World.UNKNOWN) || world[wumpX][wumpY - 1].contains(World.STENCH);
-                            if(!unknownDown)
-                            {
-                                System.out.println("FAIL!");
-                            }
                         }
                         if (wumpX - 1 >= 0)
                         {
-                            System.out.println("Checking left");
                             unknownLeft = world[wumpX - 1][wumpY].contains(World.UNKNOWN) || world[wumpX - 1][wumpY].contains(World.STENCH);
-                            if(!unknownLeft)
-                            {
-                                System.out.println("FAIL!");
-                            }
                         }
 
-                        if (unknownUp && unknownRight && unknownDown && unknownLeft)
+                        if(!unknownUp || !unknownRight || !unknownDown || !unknownLeft)
                         {
-                            System.out.println("There is wump in (" + wumpX + ", " + wumpY + ")");
-                        }
-                        else
-                        {
-                            System.out.println("There is no wump in (" + wumpX + ", " + wumpY + ")");
                             return false;
                         }
-                        //return unknownUp && unknownRight && unknownDown && unknownLeft;
-
                     }
                 }
             }

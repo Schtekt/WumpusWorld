@@ -91,7 +91,7 @@ public class MyAgent implements Agent
             }
             if (killWump && room.equals(goal))
             {
-                System.out.println("SHOOT");
+                //System.out.println("SHOOT");
                 w.doAction(World.A_SHOOT);
             }
             w.doAction(World.A_MOVE);
@@ -159,11 +159,11 @@ public class MyAgent implements Agent
                 Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
                 MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
                 
-                System.out.println("Prob wump: " + room.m_probabilityWump);
+                //System.out.println("Prob wump: " + room.m_probabilityWump);
                 if(room.m_probabilityWump == 100)
                 {
                     killWump = true;
-                    System.out.println("Kill the wumpus!");
+                    //System.out.println("Kill the wumpus!");
                 }
                 
                 goalRoom = tmp;
@@ -187,7 +187,7 @@ public class MyAgent implements Agent
             path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
             if(Path.m_Pit)
             {
-                System.out.println("The path has a pit");
+                //System.out.println("The path has a pit");
                 otherSideOfPit.add(goalRoom);
             }
 
@@ -419,7 +419,7 @@ public class MyAgent implements Agent
                     safeRoomsDeque.remove(tmp);
                 }
                 safeRoomsDeque.push(tmp);
-                System.out.println("Added room (" + x + "," + y + ") to safe rooms.");
+                //System.out.println("Added room (" + x + "," + y + ") to safe rooms.");
             }
         }
 
