@@ -52,6 +52,11 @@ public class Path
      */
     public static LinkedList<MyPRoom> visitedRoomsDeque;
 
+    /**
+     * Boolean indicating whether the path goes accros
+     * a pit.
+     */
+    public static boolean m_Pit;
 
     public Path()
     { }
@@ -263,6 +268,7 @@ public class Path
         }
         m_OpenList.clear();
         m_PathFound.clear();
+        m_Pit = false;
         
         // Set the player's current direction
         m_Direction = m_World.getDirection();
@@ -300,6 +306,7 @@ public class Path
         do
         {
             m_PathFound.push(m_CurrentRoom);
+            m_Pit = m_CurrentRoom.hasPit();
             m_CurrentRoom = m_CurrentRoom.getParentRoom();
         } while (!m_CurrentRoom.equals(m_StartRoom));
 
