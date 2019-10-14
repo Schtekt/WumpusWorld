@@ -44,8 +44,7 @@ public class MyAgent implements Agent
      * Tries to move the player to the specified room.
      * Returns {@code false} if the room is not adjacent
      * to the current room.
-     * @param x The x coordinate of the target room
-     * @param y The y coordinate of the target room
+     * @param room The room to which the player should move
      * @return {@code false} if the target room is not adjacent to the current room
      */
     public boolean MoveToRoom(MyPRoom room)
@@ -446,13 +445,5 @@ public class MyAgent implements Agent
         }
         return 0;
     }
-    /**
-     * Genertes a random instruction for the Agent.
-     */
-    public int decideRandomMove()
-    {
-      return (int)(Math.random() * 4);
-    }
-    
 }
 

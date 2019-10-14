@@ -34,6 +34,19 @@ public class GUI implements ActionListener
     private ImageIcon l_player_left;
     private ImageIcon l_player_right;
     
+    private ImageIcon l_my_breeze;
+    private ImageIcon l_my_stench;
+    private ImageIcon l_my_pit;
+    private ImageIcon l_my_glitter;
+    private ImageIcon l_my_wumpus;
+    private ImageIcon l_my_player_up;
+    private ImageIcon l_my_player_down;
+    private ImageIcon l_my_player_left;
+    private ImageIcon l_my_player_right;
+
+    private ImageIcon bg;
+    private ImageIcon uk;
+    
     /**
      * Creates and start the GUI.
      */
@@ -66,6 +79,20 @@ public class GUI implements ActionListener
         l_player_left = new ImageIcon("gfx/PL.png");
         l_player_right = new ImageIcon("gfx/PR.png");
         
+        l_my_breeze = new ImageIcon("gfx/Breeze.gif");
+        l_my_stench = new ImageIcon("gfx/Stench.gif");
+        l_my_pit = new ImageIcon("gfx/Pit.png");
+        l_my_glitter = new ImageIcon("gfx/Gold.gif");
+        l_my_wumpus = new ImageIcon("gfx/Wumpus.gif");
+        l_my_player_up = new ImageIcon("gfx/PU.png");
+        l_my_player_down = new ImageIcon("gfx/PD.png");
+        l_my_player_left = new ImageIcon("gfx/PL.png");
+        l_my_player_right = new ImageIcon("gfx/PR.png");
+
+        bg = new ImageIcon("gfx/background.png");
+        // bg = new ImageIcon("gfx/background2.png");
+        uk = new ImageIcon("gfx/unknown.png");
+
         createWindow();
     }
     
@@ -131,6 +158,7 @@ public class GUI implements ActionListener
                 blocks[i][j].setPreferredSize(new Dimension(150,150));
                 blocks[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
                 blocks[i][j].setLayout(new GridLayout(2,2));
+                blocks[i][j].setLayout(new BorderLayout());
                 gamepanel.add(blocks[i][j]);
             }
         }
@@ -282,25 +310,32 @@ public class GUI implements ActionListener
             {
                 blocks[i][j].removeAll();
                 blocks[i][j].setBackground(Color.WHITE);
+                JLabel bgPane = new JLabel(bg);
+                bgPane.setLayout(new GridLayout(2,2));
                 if (w.hasPit(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_pit));
+                    bgPane.add(new JLabel(l_my_pit));
                 }
                 if (w.hasBreeze(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_breeze));
+                    bgPane.add(new JLabel(l_my_breeze));
                 }
                 if (w.hasStench(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_stench));
+                    bgPane.add(new JLabel(l_my_stench));
                 }
                 if (w.hasWumpus(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_wumpus));
+                    bgPane.add(new JLabel(l_my_wumpus));
                 }
                 if (w.hasGlitter(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_glitter));
+                    bgPane.add(new JLabel(l_my_glitter));
                 }
                 if (w.hasPlayer(i+1, j+1))
                 {
@@ -308,11 +343,19 @@ public class GUI implements ActionListener
                     if (w.getDirection() == World.DIR_UP) blocks[i][j].add(new JLabel(l_player_up));
                     if (w.getDirection() == World.DIR_LEFT) blocks[i][j].add(new JLabel(l_player_left));
                     if (w.getDirection() == World.DIR_RIGHT) blocks[i][j].add(new JLabel(l_player_right));
+
+                    if (w.getDirection() == World.DIR_DOWN) bgPane.add(new JLabel(l_my_player_down));
+                    if (w.getDirection() == World.DIR_UP) bgPane.add(new JLabel(l_my_player_up));
+                    if (w.getDirection() == World.DIR_LEFT) bgPane.add(new JLabel(l_my_player_left));
+                    if (w.getDirection() == World.DIR_RIGHT) bgPane.add(new JLabel(l_my_player_right));
                 }
                 if (w.isUnknown(i+1, j+1))
                 {
                     blocks[i][j].setBackground(Color.GRAY);
+                    bgPane.setIcon(uk);
                 }
+                
+                blocks[i][j].add(bgPane);
                 
                 blocks[i][j].updateUI();
                 blocks[i][j].repaint();
