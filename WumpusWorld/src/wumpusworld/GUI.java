@@ -34,6 +34,7 @@ public class GUI implements ActionListener
     private ImageIcon l_player_left;
     private ImageIcon l_player_right;
     
+    // My icons
     private ImageIcon l_my_breeze;
     private ImageIcon l_my_stench;
     private ImageIcon l_my_pit;
@@ -43,8 +44,8 @@ public class GUI implements ActionListener
     private ImageIcon l_my_player_down;
     private ImageIcon l_my_player_left;
     private ImageIcon l_my_player_right;
-
     private ImageIcon bg;
+    private ImageIcon bgPit;
     private ImageIcon uk;
     
     /**
@@ -79,6 +80,7 @@ public class GUI implements ActionListener
         l_player_left = new ImageIcon("gfx/PL.png");
         l_player_right = new ImageIcon("gfx/PR.png");
         
+        // Set my icons
         l_my_breeze = new ImageIcon("gfx/Breeze.gif");
         l_my_stench = new ImageIcon("gfx/Stench.gif");
         l_my_pit = new ImageIcon("gfx/Pit.png");
@@ -88,8 +90,8 @@ public class GUI implements ActionListener
         l_my_player_down = new ImageIcon("gfx/PlayerDown.png");
         l_my_player_left = new ImageIcon("gfx/PlayerLeft.png");
         l_my_player_right = new ImageIcon("gfx/PlayerRight.png");
-
         bg = new ImageIcon("gfx/background.png");
+        bgPit = new ImageIcon("gfx/backgroundPit.png");
         uk = new ImageIcon("gfx/unknown.png");
 
         createWindow();
@@ -124,15 +126,16 @@ public class GUI implements ActionListener
             f = new File("gfx/PR.png");
             if (!f.exists()) return false;
             
-            f = new File("gfx/Breeze.png");
+            // Check for my icons
+            f = new File("gfx/Breeze.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Stench.png");
+            f = new File("gfx/Stench.gif");
             if (!f.exists()) return false;
             f = new File("gfx/Pit.png");
             if (!f.exists()) return false;
-            f = new File("gfx/Gold.png");
+            f = new File("gfx/Gold.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Wumpus.png");
+            f = new File("gfx/Wumpus.gif");
             if (!f.exists()) return false;
             f = new File("gfx/PlayerUp.png");
             if (!f.exists()) return false;
@@ -141,6 +144,10 @@ public class GUI implements ActionListener
             f = new File("gfx/PlayerLeft.png");
             if (!f.exists()) return false;
             f = new File("gfx/PlayerRight.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/background.png");
+            if (!f.exists()) return false;
+            f = new File("gfx/backgroundPit.png");
             if (!f.exists()) return false;
         }
         catch (Exception ex)
@@ -159,6 +166,9 @@ public class GUI implements ActionListener
         frame.setSize(820, 640);
         frame.getContentPane().setLayout(new FlowLayout());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        // Change size to make sure buttons are visible
+        frame.setSize(900, 640);
         
         gamepanel = new JPanel();
         gamepanel.setPreferredSize(new Dimension(600,600));
@@ -176,7 +186,11 @@ public class GUI implements ActionListener
                 blocks[i][j].setPreferredSize(new Dimension(150,150));
                 blocks[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
                 blocks[i][j].setLayout(new GridLayout(2,2));
+
+                // Different layout to incorporate my icons
                 blocks[i][j].setLayout(new BorderLayout());
+                blocks[i][j].setBorder(BorderFactory.createEmptyBorder());
+
                 gamepanel.add(blocks[i][j]);
             }
         }
@@ -186,6 +200,7 @@ public class GUI implements ActionListener
         JPanel buttons = new JPanel();
         buttons.setPreferredSize(new Dimension(200,600));
         buttons.setLayout(new FlowLayout());
+        buttons.setPreferredSize(new Dimension(240, 600));
         //Status label
         status = new JLabel("", SwingConstants.CENTER);
         status.setPreferredSize(new Dimension(200,25));
@@ -209,20 +224,24 @@ public class GUI implements ActionListener
         buttons.add(br);
         JButton bg = new JButton("Grab");
         bg.setPreferredSize(new Dimension(45,22));
+        bg.setPreferredSize(new Dimension(75,22));
         bg.setActionCommand("GRAB");
         bg.addActionListener(this);
         buttons.add(bg);
         JButton bc = new JButton("Climb");
         bc.setPreferredSize(new Dimension(55,22));
+        bc.setPreferredSize(new Dimension(75,22));
         bc.setActionCommand("CLIMB");
         bc.addActionListener(this);
         buttons.add(bc);
         JButton bs = new JButton("Shoot");
         bs.setPreferredSize(new Dimension(65,22));
+        bs.setPreferredSize(new Dimension(75,22));
         bs.setActionCommand("SHOOT");
         bs.addActionListener(this);
         buttons.add(bs);
         JButton ba = new JButton("Run Solving Agent");
+        ba.setText("Run Gunnar");
         ba.setActionCommand("AGENT");
         ba.addActionListener(this);
         buttons.add(ba);
@@ -333,7 +352,7 @@ public class GUI implements ActionListener
                 if (w.hasPit(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_pit));
-                    bgPane.add(new JLabel(l_my_pit));
+                    bgPane.setIcon(bgPit);
                 }
                 if (w.hasBreeze(i+1, j+1))
                 {
