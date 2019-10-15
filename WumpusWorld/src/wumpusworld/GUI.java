@@ -222,6 +222,7 @@ public class GUI implements ActionListener
         bl.addActionListener(this);
         // Set my icon
         bl.setIcon(new ImageIcon("src/wumpusworld/myGFX/TurnLeft.png"));
+        bl.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/TurnLeftPressed.png"));
         bl.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bl);
         JButton bf = new JButton(new ImageIcon("gfx/MF.png"));
@@ -229,6 +230,7 @@ public class GUI implements ActionListener
         bf.addActionListener(this);
         // Set my icon
         bf.setIcon(new ImageIcon("src/wumpusworld/myGFX/MoveForward.png"));
+        bf.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/MoveForwardPressed.png"));
         bf.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bf);
         JButton br = new JButton(new ImageIcon("gfx/TR.png"));
@@ -236,6 +238,7 @@ public class GUI implements ActionListener
         br.addActionListener(this);
         // Set my icon
         br.setIcon(new ImageIcon("src/wumpusworld/myGFX/TurnRight.png"));
+        br.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/TurnRightPressed.png"));
         br.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(br);
         JButton bg = new JButton("Grab");
@@ -246,6 +249,7 @@ public class GUI implements ActionListener
         // Set button image because why not
         bg.setPreferredSize(null);
         bg.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bg.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
         bg.setHorizontalTextPosition(JButton.CENTER);
         bg.setVerticalTextPosition(JButton.CENTER);
         bg.setForeground(new Color(250, 234, 140));
@@ -258,6 +262,7 @@ public class GUI implements ActionListener
         // Set button image because why not
         bc.setPreferredSize(null);
         bc.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bc.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
         bc.setHorizontalTextPosition(JButton.CENTER);
         bc.setVerticalTextPosition(JButton.CENTER);
         bc.setForeground(new Color(250, 234, 140));
@@ -270,6 +275,7 @@ public class GUI implements ActionListener
         // Set button image because why not
         bs.setPreferredSize(null);
         bs.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bs.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
         bs.setHorizontalTextPosition(JButton.CENTER);
         bs.setVerticalTextPosition(JButton.CENTER);
         bs.setForeground(new Color(250, 234, 140));
@@ -282,6 +288,7 @@ public class GUI implements ActionListener
         ba.addActionListener(this);
         // Set button image because why not
         ba.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
+        ba.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLargePressed.png"));
         ba.setHorizontalTextPosition(JButton.CENTER);
         ba.setVerticalTextPosition(JButton.CENTER);
         ba.setForeground(new Color(250, 234, 140));
@@ -306,6 +313,7 @@ public class GUI implements ActionListener
         bn.addActionListener(this);
         // Set button image because why not
         bn.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
+        bn.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLargePressed.png"));
         bn.setHorizontalTextPosition(JButton.CENTER);
         bn.setVerticalTextPosition(JButton.CENTER);
         bn.setForeground(new Color(250, 234, 140));
