@@ -160,7 +160,7 @@ public class MyAgent implements Agent
                 MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
                 
                 //System.out.println("Prob wump: " + room.m_probabilityWump);
-                if(room.m_probabilityWump == 100)
+                if(room.m_probabilityWump > 0)
                 {
                     killWump = true;
                     //System.out.println("Kill the wumpus!");
