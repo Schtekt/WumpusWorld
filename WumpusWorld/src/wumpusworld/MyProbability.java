@@ -432,7 +432,17 @@ public class MyProbability
     {
         ArrayList<String[][]> models;
         models = new ArrayList<String[][]>();
-        models.add(m_knownData);
+        String[][] toSend = new String[m_knownData.length][m_knownData.length];
+
+        for(int i = 0; i < m_knownData.length; i++)
+        {
+            for(int j = 0; j < m_knownData[i].length; j++)
+            {
+                toSend[i][j] = m_knownData[i][j];
+            }
+        }
+
+        models.add(toSend);
 
         /*for(int i = 0; i < m_knownData.length; i++)
         {
@@ -570,7 +580,7 @@ public class MyProbability
             }
         }
 
-        // System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y);
+        // System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y + " WumpusProb: " + toReturn.m_probabilityWump);
         return toReturn;
     }
 }
