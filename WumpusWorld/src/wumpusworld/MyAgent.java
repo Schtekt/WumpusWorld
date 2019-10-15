@@ -99,6 +99,27 @@ public class MyAgent implements Agent
         }
         return false;
     }
+
+    /**
+     * Prepares the probability class and runs {@code MyProbability.calculate()}.
+     * @return {@code true}
+     */
+    public boolean doCalc()
+    {
+        String[][] perception = new String[w.getSize()][w.getSize()];
+        for(int i = 1; i <= w.getSize(); i++)
+        {
+            for(int j = 1; j <= w.getSize(); j++)
+            {
+                perception[i-1][j-1] = percieveRoom(i, j);
+            }
+        }
+        probCalc.setData(perception);
+        
+        probCalc.calculate(availableRoomsDeque);
+
+        return true;
+    }
             
     /**
      * Asks your solver agent to execute an action.
@@ -130,20 +151,10 @@ public class MyAgent implements Agent
         // It should be the cheapest one to move to from the 
         // player's current position
         MyPRoom goalRoom;
+        boolean calcDone = false;
         if(safeRoomsDeque.isEmpty() && !availableRoomsDeque.isEmpty())
         {
-            String[][] perception = new String[w.getSize()][w.getSize()];
-            for(int i = 1; i <= w.getSize(); i++)
-            {
-                for(int j = 1; j <= w.getSize(); j++)
-                {
-                    perception[i-1][j-1] = percieveRoom(i, j);
-                }
-            }
-
-            probCalc.setData(perception);
-            
-            probCalc.calculate(availableRoomsDeque);
+            calcDone = doCalc();
         }
         otherSideOfPit.clear();
         boolean maybeWump = false;
@@ -156,6 +167,10 @@ public class MyAgent implements Agent
             }
             else if(!availableRoomsDeque.isEmpty())
             {
+                if (!calcDone)
+                {
+                    calcDone = doCalc();
+                }
                 Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
                 MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
                 

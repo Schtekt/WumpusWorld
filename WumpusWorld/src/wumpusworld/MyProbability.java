@@ -547,8 +547,8 @@ public class MyProbability
         for(int i = 0; i < rooms.size(); i++)
         {
             MyPRoom tmp = rooms.get(i);
-            // System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
-            // System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
+            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
+            System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
 
             if((m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump || toReturn == null))
             {
