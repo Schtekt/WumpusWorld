@@ -159,7 +159,7 @@ public class MyAgent implements Agent
                 Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque);
                 MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
                 
-                //System.out.println("Prob wump: " + room.m_probabilityWump);
+                System.out.println("Prob wump: " + room.m_probabilityWump);
                 if(room.m_probabilityWump > 0)
                 {
                     killWump = true;
@@ -167,7 +167,7 @@ public class MyAgent implements Agent
                 }
                 
                 goalRoom = tmp;
-
+                
                 if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && !otherSideOfPit.isEmpty())
                 {
                     maybeWump = true;

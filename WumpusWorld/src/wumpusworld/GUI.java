@@ -37,14 +37,13 @@ public class GUI implements ActionListener
     // My icons
     private ImageIcon l_my_breeze;
     private ImageIcon l_my_stench;
-    private ImageIcon l_my_pit;
     private ImageIcon l_my_glitter;
     private ImageIcon l_my_wumpus;
     private ImageIcon l_my_player_up;
     private ImageIcon l_my_player_down;
     private ImageIcon l_my_player_left;
     private ImageIcon l_my_player_right;
-    private ImageIcon bg;
+    private ImageIcon bgImage;
     private ImageIcon bgPit;
     private ImageIcon uk;
     
@@ -81,18 +80,17 @@ public class GUI implements ActionListener
         l_player_right = new ImageIcon("gfx/PR.png");
         
         // Set my icons
-        l_my_breeze = new ImageIcon("gfx/Breeze.gif");
-        l_my_stench = new ImageIcon("gfx/Stench.gif");
-        l_my_pit = new ImageIcon("gfx/Pit.png");
-        l_my_glitter = new ImageIcon("gfx/Gold.gif");
-        l_my_wumpus = new ImageIcon("gfx/Wumpus.gif");
-        l_my_player_up = new ImageIcon("gfx/PlayerUp.png");
-        l_my_player_down = new ImageIcon("gfx/PlayerDown.png");
-        l_my_player_left = new ImageIcon("gfx/PlayerLeft.png");
-        l_my_player_right = new ImageIcon("gfx/PlayerRight.png");
-        bg = new ImageIcon("gfx/background.png");
-        bgPit = new ImageIcon("gfx/backgroundPit.png");
-        uk = new ImageIcon("gfx/unknown.png");
+        l_my_breeze = new ImageIcon("src/wumpusworld/myGFX/Breeze.gif");
+        l_my_stench = new ImageIcon("src/wumpusworld/myGFX/Stench.gif");
+        l_my_glitter = new ImageIcon("src/wumpusworld/myGFX/Gold.gif");
+        l_my_wumpus = new ImageIcon("src/wumpusworld/myGFX/Wumpus.gif");
+        l_my_player_up = new ImageIcon("src/wumpusworld/myGFX/PlayerUp.png");
+        l_my_player_down = new ImageIcon("src/wumpusworld/myGFX/PlayerDown.png");
+        l_my_player_left = new ImageIcon("src/wumpusworld/myGFX/PlayerLeft.png");
+        l_my_player_right = new ImageIcon("src/wumpusworld/myGFX/PlayerRight.png");
+        bgImage = new ImageIcon("src/wumpusworld/myGFX/background.png");
+        bgPit = new ImageIcon("src/wumpusworld/myGFX/backgroundPit.png");
+        uk = new ImageIcon("src/wumpusworld/myGFX/unknown.png");
 
         createWindow();
     }
@@ -127,27 +125,25 @@ public class GUI implements ActionListener
             if (!f.exists()) return false;
             
             // Check for my icons
-            f = new File("gfx/Breeze.gif");
+            f = new File("src/wumpusworld/myGFX/Breeze.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Stench.gif");
+            f = new File("src/wumpusworld/myGFX/Stench.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Pit.png");
+            f = new File("src/wumpusworld/myGFX/Gold.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Gold.gif");
+            f = new File("src/wumpusworld/myGFX/Wumpus.gif");
             if (!f.exists()) return false;
-            f = new File("gfx/Wumpus.gif");
+            f = new File("src/wumpusworld/myGFX/PlayerUp.png");
             if (!f.exists()) return false;
-            f = new File("gfx/PlayerUp.png");
+            f = new File("src/wumpusworld/myGFX/PlayerDown.png");
             if (!f.exists()) return false;
-            f = new File("gfx/PlayerDown.png");
+            f = new File("src/wumpusworld/myGFX/PlayerLeft.png");
             if (!f.exists()) return false;
-            f = new File("gfx/PlayerLeft.png");
+            f = new File("src/wumpusworld/myGFX/PlayerRight.png");
             if (!f.exists()) return false;
-            f = new File("gfx/PlayerRight.png");
+            f = new File("src/wumpusworld/myGFX/background.png");
             if (!f.exists()) return false;
-            f = new File("gfx/background.png");
-            if (!f.exists()) return false;
-            f = new File("gfx/backgroundPit.png");
+            f = new File("src/wumpusworld/myGFX/backgroundPit.png");
             if (!f.exists()) return false;
         }
         catch (Exception ex)
@@ -170,6 +166,8 @@ public class GUI implements ActionListener
         // Change size to make sure buttons are visible
         frame.setSize(900, 640);
         
+        frame.getContentPane().setBackground(Color.black);
+
         gamepanel = new JPanel();
         gamepanel.setPreferredSize(new Dimension(600,600));
         gamepanel.setBackground(Color.GRAY);
@@ -187,7 +185,11 @@ public class GUI implements ActionListener
                 blocks[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
                 blocks[i][j].setLayout(new GridLayout(2,2));
 
-                // Different layout to incorporate my icons
+                /*Different layout to incorporate my icons,
+                BorderLayout without specifying location
+                of components will put the m all in center
+                and only the last one added (my panel) will
+                be shown*/
                 blocks[i][j].setLayout(new BorderLayout());
                 blocks[i][j].setBorder(BorderFactory.createEmptyBorder());
 
@@ -200,50 +202,90 @@ public class GUI implements ActionListener
         JPanel buttons = new JPanel();
         buttons.setPreferredSize(new Dimension(200,600));
         buttons.setLayout(new FlowLayout());
-        buttons.setPreferredSize(new Dimension(240, 600));
+        // Change colour because white is boring
+        buttons.setBackground(Color.darkGray);
         //Status label
         status = new JLabel("", SwingConstants.CENTER);
         status.setPreferredSize(new Dimension(200,25));
+        // Change foreground colour for legibility
+        status.setForeground(new Color(250, 234, 140));
         buttons.add(status);
         //Score label
         score = new JLabel("Score: 0", SwingConstants.CENTER);
         score.setPreferredSize(new Dimension(200,25));
+        // Change foreground colour for legibility
+        score.setForeground(new Color(250, 234, 140));
         buttons.add(score);
         //Buttons
         JButton bl = new JButton(new ImageIcon("gfx/TL.png"));
         bl.setActionCommand("TL");
         bl.addActionListener(this);
+        // Set my icon
+        bl.setIcon(new ImageIcon("src/wumpusworld/myGFX/TurnLeft.png"));
+        bl.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bl);
         JButton bf = new JButton(new ImageIcon("gfx/MF.png"));
         bf.setActionCommand("MF");
         bf.addActionListener(this);
+        // Set my icon
+        bf.setIcon(new ImageIcon("src/wumpusworld/myGFX/MoveForward.png"));
+        bf.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bf);
         JButton br = new JButton(new ImageIcon("gfx/TR.png"));
         br.setActionCommand("TR");
         br.addActionListener(this);
+        // Set my icon
+        br.setIcon(new ImageIcon("src/wumpusworld/myGFX/TurnRight.png"));
+        br.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(br);
         JButton bg = new JButton("Grab");
         bg.setPreferredSize(new Dimension(45,22));
-        bg.setPreferredSize(new Dimension(75,22));
         bg.setActionCommand("GRAB");
         bg.addActionListener(this);
+
+        // Set button image because why not
+        bg.setPreferredSize(null);
+        bg.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bg.setHorizontalTextPosition(JButton.CENTER);
+        bg.setVerticalTextPosition(JButton.CENTER);
+        bg.setForeground(new Color(250, 234, 140));
+        bg.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bg);
         JButton bc = new JButton("Climb");
         bc.setPreferredSize(new Dimension(55,22));
-        bc.setPreferredSize(new Dimension(75,22));
         bc.setActionCommand("CLIMB");
         bc.addActionListener(this);
+        // Set button image because why not
+        bc.setPreferredSize(null);
+        bc.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bc.setHorizontalTextPosition(JButton.CENTER);
+        bc.setVerticalTextPosition(JButton.CENTER);
+        bc.setForeground(new Color(250, 234, 140));
+        bc.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bc);
         JButton bs = new JButton("Shoot");
         bs.setPreferredSize(new Dimension(65,22));
-        bs.setPreferredSize(new Dimension(75,22));
         bs.setActionCommand("SHOOT");
         bs.addActionListener(this);
+        // Set button image because why not
+        bs.setPreferredSize(null);
+        bs.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
+        bs.setHorizontalTextPosition(JButton.CENTER);
+        bs.setVerticalTextPosition(JButton.CENTER);
+        bs.setForeground(new Color(250, 234, 140));
+        bs.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bs);
         JButton ba = new JButton("Run Solving Agent");
+        // Change name of Solving Agent just because
         ba.setText("Run Gunnar");
         ba.setActionCommand("AGENT");
         ba.addActionListener(this);
+        // Set button image because why not
+        ba.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
+        ba.setHorizontalTextPosition(JButton.CENTER);
+        ba.setVerticalTextPosition(JButton.CENTER);
+        ba.setForeground(new Color(250, 234, 140));
+        ba.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(ba);
         //Add a delimiter
         JLabel l = new JLabel("");
@@ -262,6 +304,12 @@ public class GUI implements ActionListener
         JButton bn = new JButton("New Game");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
+        // Set button image because why not
+        bn.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
+        bn.setHorizontalTextPosition(JButton.CENTER);
+        bn.setVerticalTextPosition(JButton.CENTER);
+        bn.setForeground(new Color(250, 234, 140));
+        bn.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bn);
         
         frame.getContentPane().add(buttons);
@@ -347,31 +395,37 @@ public class GUI implements ActionListener
             {
                 blocks[i][j].removeAll();
                 blocks[i][j].setBackground(Color.WHITE);
-                JLabel bgPane = new JLabel(bg);
+                // Label with my background
+                JLabel bgPane = new JLabel(bgImage);
                 bgPane.setLayout(new GridLayout(2,2));
                 if (w.hasPit(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_pit));
+                    // Set background with pit to my label
                     bgPane.setIcon(bgPit);
                 }
                 if (w.hasBreeze(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_breeze));
+                    // Add my icon to my label
                     bgPane.add(new JLabel(l_my_breeze));
                 }
                 if (w.hasStench(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_stench));
+                    // Add my icon to my label
                     bgPane.add(new JLabel(l_my_stench));
                 }
                 if (w.hasWumpus(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_wumpus));
+                    // Add my icon to my label
                     bgPane.add(new JLabel(l_my_wumpus));
                 }
                 if (w.hasGlitter(i+1, j+1))
                 {
                     blocks[i][j].add(new JLabel(l_glitter));
+                    // Add my icon to my label
                     bgPane.add(new JLabel(l_my_glitter));
                 }
                 if (w.hasPlayer(i+1, j+1))
@@ -380,7 +434,8 @@ public class GUI implements ActionListener
                     if (w.getDirection() == World.DIR_UP) blocks[i][j].add(new JLabel(l_player_up));
                     if (w.getDirection() == World.DIR_LEFT) blocks[i][j].add(new JLabel(l_player_left));
                     if (w.getDirection() == World.DIR_RIGHT) blocks[i][j].add(new JLabel(l_player_right));
-
+                    
+                    // Add my icon to my label
                     if (w.getDirection() == World.DIR_DOWN) bgPane.add(new JLabel(l_my_player_down));
                     if (w.getDirection() == World.DIR_UP) bgPane.add(new JLabel(l_my_player_up));
                     if (w.getDirection() == World.DIR_LEFT) bgPane.add(new JLabel(l_my_player_left));
@@ -389,9 +444,10 @@ public class GUI implements ActionListener
                 if (w.isUnknown(i+1, j+1))
                 {
                     blocks[i][j].setBackground(Color.GRAY);
+                    // Set unknown background to my label
                     bgPane.setIcon(uk);
                 }
-                
+                // Add my label to the block 
                 blocks[i][j].add(bgPane);
                 
                 blocks[i][j].updateUI();
