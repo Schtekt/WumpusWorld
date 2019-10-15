@@ -543,6 +543,7 @@ public class MyProbability
         int bestWump = 100;
         int bestPit = 100;
         Coordinate toReturn = null;
+        boolean wumpusFound = false;
 
         for(int i = 0; i < rooms.size(); i++)
         {
@@ -559,6 +560,8 @@ public class MyProbability
                     bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
                     toReturn.m_probabilityWump = bestWump;
                     toReturn.m_probabilityPit = bestPit;
+                    wumpusFound = (bestWump == 100);
+                    bestWump = (bestWump == 0 && bestPit == 100) ? 100 : bestWump;
                 }
                 else if (!(toReturn.m_probabilityWump == 100 && toReturn.m_probabilityPit == 0))
                 {
@@ -567,9 +570,11 @@ public class MyProbability
                     bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
                     toReturn.m_probabilityWump = bestWump;
                     toReturn.m_probabilityPit = bestPit;
+                    wumpusFound = (bestWump == 100);
+                    bestWump = (bestWump == 0 && bestPit == 100) ? 100 : bestWump;
                 }
             }
-            else if(m_pitProb[tmp.getX() - 1][tmp.getY() - 1] < bestPit && m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] <= bestWump && !(toReturn.m_probabilityWump == 100 && toReturn.m_probabilityPit == 0))
+            else if((m_pitProb[tmp.getX() - 1][tmp.getY() - 1] < bestPit || (bestPit == 100 && wumpusFound)) && m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] <= bestWump && !(toReturn.m_probabilityWump == 100 && toReturn.m_probabilityPit == 0))
             {
                 System.out.println("switching from (" + toReturn.m_X + ", " + toReturn.m_Y + ")" + " to (" + tmp.getX() + ", " + tmp.getY() + ")");
                 toReturn = new Coordinate(tmp.getX(), tmp.getY());
@@ -577,6 +582,8 @@ public class MyProbability
                 bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
                 toReturn.m_probabilityWump = bestWump;
                 toReturn.m_probabilityPit = bestPit;
+                wumpusFound = (bestWump == 100);
+                bestWump = (bestWump == 0 && bestPit == 100) ? 100 : bestWump;
             }
         }
 
