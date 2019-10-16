@@ -540,18 +540,39 @@ public class MyProbability
 
     public Coordinate getSafestCoordinates(List<MyPRoom> rooms)
     {
-        int bestWump = 100;
-        int bestPit = 100;
+        int bestWump = -1;
+        int bestPit = -1;
         Coordinate toReturn = null;
-        boolean wumpusFound = false;
+        MyPRoom tmp = rooms.get(0);
+        toReturn = new Coordinate(tmp.getX(), tmp.getY());
+        bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
+        bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+        toReturn.m_probabilityWump = bestWump;
+        toReturn.m_probabilityPit = bestPit;
 
-        for(int i = 0; i < rooms.size(); i++)
+        for(int i = 1; i < rooms.size(); i++)
         {
-            MyPRoom tmp = rooms.get(i);
+            tmp = rooms.get(i);
             System.out.println(tmp.getX() + ", " + tmp.getY() + "has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
             System.out.println(tmp.getX() + ", " + tmp.getY() + "has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
 
-            if((m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump && (m_pitProb[tmp.getX() - 1][tmp.getY() - 1] != 100  && bestPit < 100)) || toReturn == null)
+            if(m_pitProb[tmp.getX() - 1][tmp.getY() - 1] < bestPit)
+            {
+                toReturn = new Coordinate(tmp.getX(), tmp.getY());
+                bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
+                bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+                toReturn.m_probabilityWump = bestWump;
+                toReturn.m_probabilityPit = bestPit;
+            }
+            else if(m_pitProb[tmp.getX() - 1][tmp.getY() - 1] == bestPit && m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump)
+            {
+                toReturn = new Coordinate(tmp.getX(), tmp.getY());
+                bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
+                bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
+                toReturn.m_probabilityWump = bestWump;
+                toReturn.m_probabilityPit = bestPit;
+            }
+            /*if((m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] < bestWump && (m_pitProb[tmp.getX() - 1][tmp.getY() - 1] != 100  && bestPit < 100)) || toReturn == null)
             {
                 if (toReturn == null)
                 {
@@ -584,7 +605,7 @@ public class MyProbability
                 toReturn.m_probabilityPit = bestPit;
                 wumpusFound = (bestWump == 100);
                 bestWump = (bestWump == 0 && bestPit == 100) ? 100 : bestWump;
-            }
+            }*/
         }
 
         // System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y + " WumpusProb: " + toReturn.m_probabilityWump);
