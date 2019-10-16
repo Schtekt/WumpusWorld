@@ -34,6 +34,8 @@ public class MyProbability
             for(int j = 0; j < data[i].length; j++)
             {
                 m_knownData[i][j] = data[i][j];
+                m_pitProb[i][j] = -1;
+                m_wumpProb[i][j] = -1;
             }
         }
     }
@@ -135,7 +137,6 @@ public class MyProbability
                 }
                 else
                 {
-                    // System.out.println("Threw wump! " + i);
                 }
             }
             possibleWumpus = legitWump;
