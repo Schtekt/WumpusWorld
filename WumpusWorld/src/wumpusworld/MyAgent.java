@@ -16,10 +16,8 @@ public class MyAgent implements Agent
     private World w;
     int rnd;
     int count = 0;
-    List<MyPRoom> availableRooms;
     LinkedList<MyPRoom> availableRoomsDeque;
     LinkedList<MyPRoom> safeRoomsDeque;
-    List<MyPRoom> safeRooms;
     LinkedList<MyPRoom> path;
     LinkedList<MyPRoom> otherSideOfPit;
     boolean killWump;
@@ -35,8 +33,6 @@ public class MyAgent implements Agent
         w = world;
         Path.Init(w);
 
-        availableRooms = new ArrayList<MyPRoom>();
-        safeRooms = new ArrayList<MyPRoom>();
         Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
@@ -126,8 +122,6 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-        do
-        {
         //Location of the player
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
@@ -148,6 +142,15 @@ public class MyAgent implements Agent
         
         updateAvailableRooms(cX, cY);
         updateSafeRooms();
+
+        for (MyPRoom room : availableRoomsDeque)
+        {
+            System.out.println("Available room " + room.getX() + ", " + room.getY() + " has h value: " + room.getH());
+        }
+        for (MyPRoom room : safeRoomsDeque)
+        {
+            System.out.println("Safe room " + room.getX() + ", " + room.getY());
+        }
 
         // Select the first room in the safe rooms linked list.
         // It should be the cheapest one to move to from the 
@@ -279,8 +282,7 @@ public class MyAgent implements Agent
         catch(IOException e)
         {
 
-        }
-    } while(false);                
+        }              
     }
 
     void addAvailableRooms(int playerX, int playerY)
@@ -333,46 +335,6 @@ public class MyAgent implements Agent
             }
             availableRoomsDeque.push(tmp);
         }
-
-        if(w.isValidPosition(playerX + 1, playerY) && !w.isVisited(playerX + 1, playerY))
-        {
-            MyPRoom tmp = new MyPRoom(playerX + 1, playerY);
-            
-            if(!availableRooms.contains(tmp))
-            {
-                availableRooms.add(tmp);
-            }
-        }
-
-        if(w.isValidPosition(playerX - 1, playerY) && !w.isVisited(playerX - 1, playerY))
-        {
-            MyPRoom tmp = new MyPRoom(playerX - 1, playerY);
-            
-            if(!availableRooms.contains(tmp))
-            {
-                availableRooms.add(tmp);
-            }
-        }
-
-        if(w.isValidPosition(playerX, playerY + 1) && !w.isVisited(playerX, playerY + 1))
-        {
-            MyPRoom tmp = new MyPRoom(playerX, playerY + 1);
-            
-            if(!availableRooms.contains(tmp))
-            {
-                availableRooms.add(tmp);
-            }
-        }
-
-        if(w.isValidPosition(playerX, playerY - 1) && !w.isVisited(playerX, playerY - 1))
-        {
-            MyPRoom tmp = new MyPRoom(playerX, playerY - 1);
-            
-            if(!availableRooms.contains(tmp))
-            {
-                availableRooms.add(tmp);
-            }
-        }
     }
 
     void updateAvailableRooms(int playerX, int playerY)
@@ -382,47 +344,24 @@ public class MyAgent implements Agent
         for(int i = 0; i < availableRoomsDeque.size(); i++)
         {
             MyPRoom tmp = availableRoomsDeque.get(i);
+            tmp.setH(Math.abs(tmp.getX() - playerX) + Math.abs(tmp.getY() - playerY));
             if(w.isVisited(tmp.getX(), tmp.getY()))
             {
                 availableRoomsDeque.remove(i);
             }
         }
 
-        for(int i = 0; i < availableRooms.size(); i++)
-        {
-            MyPRoom tmp = availableRooms.get(i);
-            if(w.isVisited(tmp.getX(), tmp.getY()))
+        availableRoomsDeque.sort(new Comparator<MyPRoom>() {
+            @Override
+            public int compare(MyPRoom r1, MyPRoom r2)
             {
-                availableRooms.remove(i);
+                return  r1.getH() - r2.getH();
             }
-        }
+        });
     }
     
     void updateSafeRooms()
     {
-        for(int i = 0; i < availableRooms.size(); i++)
-        {
-            MyPRoom tmp = availableRooms.get(i);
-            int x = tmp.getX();
-            int y = tmp.getY();
-
-            if(pitNo(x,y) && wumpNo(x,y) && !safeRooms.contains(tmp))
-            {
-                // Found a room that absoluteley does not have a wumpus or pit within. 
-                // Add to rooms which we can move to.
-                safeRooms.add(tmp);
-            }
-        }
-
-        for(int i = 0; i < safeRooms.size(); i++)
-        {
-            MyPRoom tmp = safeRooms.get(i);
-            if(w.isVisited(tmp.getX(), tmp.getY()))
-            {
-                safeRooms.remove(i);
-            }
-        }
-
         for(int i = availableRoomsDeque.size() - 1; i >= 0; i--)
         {
             MyPRoom tmp = availableRoomsDeque.get(i);
@@ -436,7 +375,6 @@ public class MyAgent implements Agent
                     safeRoomsDeque.remove(tmp);
                 }
                 safeRoomsDeque.push(tmp);
-                //System.out.println("Added room (" + x + "," + y + ") to safe rooms.");
             }
         }
 
