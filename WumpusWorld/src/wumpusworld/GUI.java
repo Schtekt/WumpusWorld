@@ -39,6 +39,7 @@ public class GUI implements ActionListener
     private ImageIcon l_my_stench;
     private ImageIcon l_my_glitter;
     private ImageIcon l_my_wumpus;
+    private ImageIcon l_my_pit;
     private ImageIcon l_my_player_up;
     private ImageIcon l_my_player_down;
     private ImageIcon l_my_player_left;
@@ -84,6 +85,7 @@ public class GUI implements ActionListener
         l_my_stench = new ImageIcon("src/wumpusworld/myGFX/Stench.gif");
         l_my_glitter = new ImageIcon("src/wumpusworld/myGFX/Gold.gif");
         l_my_wumpus = new ImageIcon("src/wumpusworld/myGFX/Wumpus.gif");
+        l_my_pit = new ImageIcon("src/wumpusworld/myGFX/Pit.png");
         l_my_player_up = new ImageIcon("src/wumpusworld/myGFX/PlayerUp.png");
         l_my_player_down = new ImageIcon("src/wumpusworld/myGFX/PlayerDown.png");
         l_my_player_left = new ImageIcon("src/wumpusworld/myGFX/PlayerLeft.png");
@@ -132,6 +134,8 @@ public class GUI implements ActionListener
             f = new File("src/wumpusworld/myGFX/Gold.gif");
             if (!f.exists()) return false;
             f = new File("src/wumpusworld/myGFX/Wumpus.gif");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/Pit.png");
             if (!f.exists()) return false;
             f = new File("src/wumpusworld/myGFX/PlayerUp.png");
             if (!f.exists()) return false;
@@ -319,6 +323,39 @@ public class GUI implements ActionListener
         bn.setForeground(new Color(250, 234, 140));
         bn.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bn);
+        
+        // Setting up my legend
+        JLabel legend = new JLabel();
+        legend.setIcon(new ImageIcon("src/wumpusworld/MyGFX/legend.png"));
+        legend.setPreferredSize(new Dimension(200, 350));
+        legend.setLayout(new GridLayout(5, 5));
+        JLabel lgContent = new JLabel(l_my_wumpus);
+        legend.add(lgContent);
+        JLabel lgText = new JLabel("Wumpus");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+        lgContent = new JLabel(l_my_stench);
+        legend.add(lgContent);
+        lgText = new JLabel("Stench");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+        lgContent = new JLabel(l_my_breeze);
+        legend.add(lgContent);
+        lgText = new JLabel("Breeze");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+        lgContent = new JLabel(l_my_glitter);
+        legend.add(lgContent);
+        lgText = new JLabel("Gold");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+        lgContent = new JLabel(l_my_pit);
+        legend.add(lgContent);
+        lgText = new JLabel("Pit");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+
+        buttons.add(legend);
         
         frame.getContentPane().add(buttons);
         

@@ -6,6 +6,7 @@ public class MyPRoom
     private int m_y;
 
     private int m_g;
+    private int m_h;
     private int m_f;
     private boolean m_closed;
     private MyPRoom m_ParentRoom;
@@ -24,6 +25,7 @@ public class MyPRoom
         m_y = y;
         
         m_g = 0;
+        m_h = 0;
         m_f = 0;
         m_closed = false;
         m_ParentRoom = null;
@@ -106,6 +108,11 @@ public class MyPRoom
         return m_g;
     }
 
+    public int getH()
+    {
+        return m_h;
+    }
+
     public int getF()
     {
         return m_f;
@@ -129,6 +136,11 @@ public class MyPRoom
     public void setG(int value)
     {
         m_g = value;
+    }
+
+    public void setH(int value)
+    {
+        m_h = value;
     }
 
     public void setF(int value)
