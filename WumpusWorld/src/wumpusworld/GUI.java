@@ -149,6 +149,30 @@ public class GUI implements ActionListener
             if (!f.exists()) return false;
             f = new File("src/wumpusworld/myGFX/backgroundPit.png");
             if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/unknown.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/TurnLeft.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/TurnLeftPressed.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/MoveForward.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/MoveForwardPressed.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/TurnRight.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/TurnRightPressed.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/button.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/buttonPressed.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/buttonLarge.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/buttonLargePressed.png");
+            if (!f.exists()) return false;
+            f = new File("src/wumpusworld/myGFX/legend.png");
+            if (!f.exists()) return false;
         }
         catch (Exception ex)
         {
@@ -329,9 +353,11 @@ public class GUI implements ActionListener
         legend.setIcon(new ImageIcon("src/wumpusworld/MyGFX/legend.png"));
         legend.setPreferredSize(new Dimension(200, 350));
         legend.setLayout(new GridLayout(5, 5));
-        JLabel lgContent = new JLabel(l_my_wumpus);
+        JLabel lgContent;
+        JLabel lgText;
+        lgContent = new JLabel(l_my_breeze);
         legend.add(lgContent);
-        JLabel lgText = new JLabel("Wumpus");
+        lgText = new JLabel("Breeze");
         lgText.setForeground(new Color(250, 234, 140));
         legend.add(lgText);
         lgContent = new JLabel(l_my_stench);
@@ -339,9 +365,14 @@ public class GUI implements ActionListener
         lgText = new JLabel("Stench");
         lgText.setForeground(new Color(250, 234, 140));
         legend.add(lgText);
-        lgContent = new JLabel(l_my_breeze);
+        lgContent = new JLabel(l_my_pit);
         legend.add(lgContent);
-        lgText = new JLabel("Breeze");
+        lgText = new JLabel("Pit");
+        lgText.setForeground(new Color(250, 234, 140));
+        legend.add(lgText);
+        lgContent = new JLabel(l_my_wumpus);
+        legend.add(lgContent);
+        lgText = new JLabel("Wumpus");
         lgText.setForeground(new Color(250, 234, 140));
         legend.add(lgText);
         lgContent = new JLabel(l_my_glitter);
@@ -349,12 +380,7 @@ public class GUI implements ActionListener
         lgText = new JLabel("Gold");
         lgText.setForeground(new Color(250, 234, 140));
         legend.add(lgText);
-        lgContent = new JLabel(l_my_pit);
-        legend.add(lgContent);
-        lgText = new JLabel("Pit");
-        lgText.setForeground(new Color(250, 234, 140));
-        legend.add(lgText);
-
+        
         buttons.add(legend);
         
         frame.getContentPane().add(buttons);
