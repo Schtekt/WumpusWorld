@@ -4,11 +4,14 @@ import java.util.*;
 
 public class MyProbability
 {
+    // m_knownData is used as the knowledgebase of the AI.
     private String[][] m_knownData;
 
+    // m_pitProb and m_wumpProb are used to store the current percentages of how sure the AI is of the existence of a pit respectively wumpus.
     private int m_pitProb[][];
     private int m_wumpProb[][];
 
+    //constructor, initiate everything
     public MyProbability(int sizeOfGrid)
     {
         m_knownData = new String[sizeOfGrid][sizeOfGrid];
@@ -27,6 +30,7 @@ public class MyProbability
 
     }
 
+    // Sets the data of the knowledgebase, when calculating probabilities the AI needs to percieve the world, where are the breezes and stenches?
     public void setData(String[][] data)
     {
         for(int i = 0; i < data.length; i++)
@@ -40,17 +44,22 @@ public class MyProbability
         }
     }
 
+    // helpful class to determine specific coordinates, this helps us when we consider possible positions of pits and/or the wumpus.
     public class Coordinate
     {
         public int m_X;
         public int m_Y;
+
         public int m_probabilityPit;
         public int m_probabilityWump;
+
         public Coordinate(int x, int y)
         {
             m_X = x;
             m_Y = y;
         }
+
+        // if the coordinates are on the same position, they are considered the same!
         public boolean equals(Object o)
         {
             if(m_X == ((Coordinate)o).m_X && m_Y == ((Coordinate)o).m_Y)
@@ -69,18 +78,19 @@ public class MyProbability
      */
     public void calculate(List<MyPRoom> availableRooms)
     {
-        // Find all positions where a pit COULD be found.
+        // Find all positions where a pit COULD be found. Based on what data has been percieved with the setData function.
         ArrayList<Coordinate> possiblePits = addPossiblePits();
 
+        // Find all positions where the wumpus COULD be found. Based on what data has been percieved with the setData function.
         ArrayList<Coordinate> possibleWumpus = addPossibleWumpus();
 
-        // Generate models for all possible combinations of pits...
+        // time to check for pits
         if(possiblePits.size() > 0)
         {
-            //System.out.println("Found possible pits!");
+            // Generate models for all possible combinations of pits... and save them to a list.
             ArrayList<String[][]> models = possibleWorlds(possiblePits);
-            //System.out.println("Generated models");
-            // Throw out any model that disobeys the rules (a model will be removed if there is a breeze without a pit).
+
+            // Add models that obeys the rules of the world to a new list.
             ArrayList<String[][]> legitModels = new ArrayList<String[][]>();
             for(int i = 0; i < models.size(); i++)
             {
@@ -90,7 +100,8 @@ public class MyProbability
                 }
             }
 
-            //NOW we can calculate...
+            // With all maps that obey the game rules saved to a list, calculations can actually begin.
+            // Count number of times a pit appears in coordinates across all maps. let's call this count an occurrence score for future reference.
             for(int i = 0; i < legitModels.size(); i++)
             {
                 String[][]tmp = legitModels.get(i);
@@ -104,23 +115,29 @@ public class MyProbability
                 }
             }
 
+            // now that all pits have gained an occurence score we simply divide their score by the number of maps
+            // We also multiply by 100 as to not use decimals in our ints.
             for(int i = 0; i < possiblePits.size(); i++)
             {
                 Coordinate tmp = possiblePits.get(i);
-                // System.out.println("This is room " + tmp.m_X + ", " + tmp.m_Y);
                 tmp.m_probabilityPit =  tmp.m_probabilityPit* 100 / legitModels.size();
                 possiblePits.set(i, tmp);
                 m_pitProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityPit;
-                //System.out.println("There is a chance of " + tmp.m_probabilityPit + "% that there is a pit in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
 
+        // Time to check for wumpus! (works alot like the pit check...)
         if(possibleWumpus.size() > 0)
         {
+            // Create a list where we will store all positions that the wumpus could reside in according to the game rules.
             ArrayList<Coordinate> legitWump = new ArrayList<Coordinate>();
+
+            // for each possible wumpus position, create a new world, check that this world is following the rules of the game
+            // and if it does, add it to the list of valid wumpus locations.
             for(int i = 0; i < possibleWumpus.size(); i++)
             {
                 String[][] tmp = new String[m_knownData.length][m_knownData.length];
+
                 for (int j = 0; j < m_knownData.length; j++)
                 {
                     for (int k = 0; k < m_knownData.length; k++)
@@ -128,6 +145,7 @@ public class MyProbability
                         tmp[j][k] = m_knownData[j][k];
                     }
                 }
+
                 Coordinate tmpCoord = possibleWumpus.get(i);
                 tmp[tmpCoord.m_X][tmpCoord.m_Y] = World.WUMPUS;
 
@@ -135,12 +153,14 @@ public class MyProbability
                 {
                     legitWump.add(tmpCoord);
                 }
-                else
-                {
-                }
             }
+
+            // Unneccessary really, but it saves some calculations if this method was to run more than once.
             possibleWumpus = legitWump;
 
+            // for each of the now validated positions of the wumpus, set a chance of the wumpus existing there to 100 divided by the
+            // number of positions.
+            // This is different from the pits since there can only be one wumpus.
             for(int i = 0; i < possibleWumpus.size(); i++)
             {
                 Coordinate tmp = possibleWumpus.get(i);
@@ -148,14 +168,16 @@ public class MyProbability
                 tmp.m_probabilityWump = 100 / possibleWumpus.size();
                 possibleWumpus.set(i,tmp);
                 m_wumpProb[tmp.m_X][tmp.m_Y] = tmp.m_probabilityWump;
-
-                //System.out.println("There is a chance of " + tmp.m_probabilityWump + "% that there is a wumpus in location (" + (tmp.m_X + 1) + ", " + (tmp.m_Y + 1) + ")\n");
             }
         }
         
+        // Now check all of the rooms that the AI could move to
+        // if it hasnt been evaluated there couldn't
+        // possibly be any danger there, so set their chances of containing wumpus and/or pits to 0.
         for(int i = 0; i < availableRooms.size(); i++)
         {
             MyPRoom tmpRoom = availableRooms.get(i);
+
             if(m_pitProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] == -1)
             {
                 m_pitProb[tmpRoom.getX() - 1][tmpRoom.getY() - 1] = 0;
@@ -175,14 +197,18 @@ public class MyProbability
      */
     private ArrayList<Coordinate> addPossiblePits()
     {
+        // this method runs on the basis that the m_knownData variable has been filled with perceptionsfrom the wumpusworld map.
         ArrayList<Coordinate> possiblePits = new ArrayList<Coordinate>();
 
+        // Add all possible locations for pits, that is all around a breeze in unchecked rooms.
+        // So check the world for breezes.
         for(int i = 0; i < m_knownData.length; i++)
         {
             for(int j = 0; j < m_knownData[i].length; j++)
             {
                 if(m_knownData[i][j].contains(World.BREEZE))
                 {
+                    // add the room to the of right the breeze as a potential pit if it is unknown.
                     if(i+1 < m_knownData.length && m_knownData[i+1][j].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i+1, j);
@@ -191,7 +217,7 @@ public class MyProbability
                             possiblePits.add(tmp);
                         }
                     }
-
+                    // add the room to the left of the breeze as a potential pit if it is unknown.
                     if(i - 1 >= 0 && m_knownData[i-1][j].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i-1, j);
@@ -202,6 +228,7 @@ public class MyProbability
                         }
                     }
 
+                    // add the room above the breeze as a potential pit if it is unknown.
                     if( j + 1 < m_knownData[i].length && m_knownData[i][j + 1].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i, j + 1);
@@ -211,6 +238,7 @@ public class MyProbability
                         }
                     }
 
+                    // add the room below the breeze as a potential pit if it is unknown.
                     if(j - 1 >= 0 && m_knownData[i][j - 1].contains(World.UNKNOWN))
                     {
                         Coordinate tmp = new Coordinate(i, j - 1);
@@ -222,6 +250,7 @@ public class MyProbability
                 }
             }
         }
+        //return the list containing possible pits.
         return possiblePits;
     }
 
@@ -232,7 +261,10 @@ public class MyProbability
      */
     private ArrayList<Coordinate> addPossibleWumpus()
     {
+        // this method runs on the basis that m_knownData has been filled with perceptions of the wumpusWorld.
         ArrayList<Coordinate> possibleWumpus = new ArrayList<Coordinate>();
+
+        // a wumpus could be anywhere around a stench, so add it to the list if the room adjacent to the stench is unknown.
         for(int i = 0; i < m_knownData.length; i++)
         {
             for(int j = 0; j < m_knownData[i].length; j++)
@@ -289,29 +321,35 @@ public class MyProbability
      */
     private boolean legitWorldPit(String[][] world)
     {
+        // Loop through the two dimensional world...
         for(int i = 0; i < world.length; i++)
         {
             for(int j = 0; j < world[i].length; j++)
             {
+                // if the world contains a breeze there needs to be atleast one pit next to it
+                // so, if there aint no pit there that world is rejected!
                 if(world[i][j].contains(World.BREEZE))
                 {
                     boolean res = false;
 
+                    // check right
                     if(i + 1 < world.length && world[i + 1][j].contains(World.PIT))
                     {
                         res = true;
                     }
 
+                    // check left
                     if( i - 1 >= 0 && world[i - 1][j].contains(World.PIT))
                     {
                         res = true;
                     }
-
+                    // check up
                     if( j + 1 < world[i].length && world[i][j + 1].contains(World.PIT))
                     {
                         res = true;
                     }
 
+                    // check down
                     if( j - 1 >= 0  && world[i][j - 1].contains(World.PIT))
                     {
                         res = true;
@@ -322,6 +360,8 @@ public class MyProbability
                         return false;
                     }
                 }
+                // if there is a pit anywhere in the world, there must be breezes around that pit on all discovered rooms
+                // if there is a breeze missing in a room where the AI has visited that is adjacent to a possible pit, this world is rejected!
                 if(world[i][j].contains(World.PIT))
                 {
                     if(i + 1 < world.length && !(world[i + 1][j].contains(World.BREEZE) || world[i + 1][j].contains(World.UNKNOWN)))
@@ -346,6 +386,7 @@ public class MyProbability
                 }
             }
         }
+        // all tests passed, the world is valid.
         return true;
     }
 
@@ -357,10 +398,13 @@ public class MyProbability
      */
     private boolean legitWorldWump(String[][] world)
     {
+        // loop through the two dimensional world...
         for(int i = 0; i < world.length; i++)
         {
             for(int j = 0; j < world[i].length; j++)
             {
+                // if the world has a stench, there must be a wumpus!
+                // look for a wumpus around the stench, if one isn't found or if more than one is found reject the world!
                 if(world[i][j].contains(World.STENCH))
                 {
                     boolean res = false;
@@ -409,11 +453,12 @@ public class MyProbability
                         wumpY = j - 1;
                         res = true;
                     }
-                    
                     if(!res)
                     {
                         return false;
                     }
+                    // if there was one and only one wumpus around the stench, check that there is a stench in all visited
+                    // rooms around the wumpus.
                     else
                     {
                         boolean unknownUp, unknownRight, unknownDown, unknownLeft;
@@ -454,8 +499,10 @@ public class MyProbability
      */
     private ArrayList<String[][]> possibleWorlds(ArrayList<Coordinate> possiblePits)
     {
-        ArrayList<String[][]> models;
-        models = new ArrayList<String[][]>();
+        // create a list variable that will contain all possible worlds
+        ArrayList<String[][]> models = new ArrayList<String[][]>();
+
+        // initiate a new world containing all data from m_knowndata, deepcopy as not to compromise the member variable.
         String[][] toSend = new String[m_knownData.length][m_knownData.length];
 
         for(int i = 0; i < m_knownData.length; i++)
@@ -466,41 +513,12 @@ public class MyProbability
             }
         }
 
+        // add this map to the models, it will be used in the following recursive function.
         models.add(toSend);
 
-        /*for(int i = 0; i < m_knownData.length; i++)
-        {
-            for(int j = 0; j < m_knownData[i].length; j++)
-            {
-                if(m_knownData[j][m_knownData.length - 1 - i] == "")
-                    System.out.print(" ");
-                System.out.print(m_knownData[j][m_knownData.length - 1 - i] + "|");
-            }
-            System.out.print("\n");
-        }*/
-
-        //System.out.println("Generated first model...");
+        // run a recursive funtion whihc generates all possible maps. saves theese maps to the list.
         recurPossibleWorlds(models, possiblePits, 0, 0, true);
-        /*for(int i = 0; i < models.size(); i++)
-        {
-            String [][] tmp = models.get(i);
-            System.out.println("Model nr " + i);
-            for(int j = 0; j < tmp.length; j++)
-            {
-                for(int k = 0; k < tmp[j].length; k++)
-                {
 
-                    // rotera med följande matris!
-                    // 0, -1
-                    // 1,  0
-                    if(tmp[k][tmp.length - 1 - j] == "")
-                        System.out.print(" ");
-                    System.out.print(tmp[k][tmp.length - 1 - j] + "|");
-                }
-                System.out.print("\n");
-            }
-            System.out.println("__________________");
-        }*/
         return models;
     }
 
@@ -514,10 +532,16 @@ public class MyProbability
      */
     private void recurPossibleWorlds(ArrayList<String[][]> models, ArrayList<Coordinate> possiblePits, int depth, int model, boolean setPit)
     {
+        // the pit can either exist or not, so like a binary tree this method chooses to give the last added map in the list a pit
+        // and then generate a new map where this pit does not exist.
+
+        // the current pit that we are looking at.
         Coordinate tmp = possiblePits.get(depth);
 
+        // Create a new map and deepcopy the information from the last model in the tree to this variable.
         String [][] nextModel = new String[m_knownData.length][m_knownData.length];
         
+        // tmpModPitYes will always add pits to it's map.
         String [][] tmpModPitYes = models.get(model);
         
         for(int i = 0; i < nextModel.length; i++)
@@ -527,39 +551,20 @@ public class MyProbability
                 nextModel[i][j] = tmpModPitYes[i][j];
             }
         }
-        
+        // add a pit to the first map, and no pit to the other model
         tmpModPitYes[tmp.m_X][tmp.m_Y] += World.PIT;
+        // make the spot unknown so that calculations of validity won't throw valid maps.
         nextModel[tmp.m_X][tmp.m_Y] = World.UNKNOWN;
+
         models.set(model, tmpModPitYes);
         models.add(nextModel);
-        // the pit either exists or it doesnt.
+
+        // if the depth hasnt been reached, keep digging!
         if(depth < possiblePits.size() - 1)
         {
             recurPossibleWorlds(models, possiblePits, depth + 1, model, true);
             recurPossibleWorlds(models, possiblePits, depth + 1, model + 1, false);
         }
-    }
-
-    public void getPitProbabilities(int[][] arr)
-    {
-        for(int i = 1; i < arr.length; i++)
-        {
-            for(int j = 1; j < arr[i].length; j++)
-            {
-                arr[i][j] = m_pitProb[i-1][j-1];
-            }
-        }
-    }
-
-    public void getWumpProbabilities(int[][] arr)
-    {
-        for(int i = 1; i < arr.length; i++)
-        {
-            for(int j = 1; j < arr[i].length; j++)
-            {
-                arr[i][j] = m_wumpProb[i-1][j-1];
-            }
-        }   
     }
 
     public Coordinate getSafestCoordinates(List<MyPRoom> rooms, boolean hasArrow)
@@ -628,7 +633,6 @@ public class MyProbability
             {
                 if (toReturn.m_probabilityWump != 100 || (m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] == 0 && m_pitProb[tmp.getX() - 1][tmp.getY() - 1] == 0) || (bestPit == 100 && toReturn.m_probabilityWump == 100))
                 {
-                    // System.out.println("switching from (" + toReturn.m_X + ", " + toReturn.m_Y + ")" + " to (" + tmp.getX() + ", " + tmp.getY() + ")");
                     toReturn = new Coordinate(tmp.getX(), tmp.getY());
                     bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
                     bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
@@ -638,8 +642,6 @@ public class MyProbability
                 }
             }
         }
-
-        // System.out.println("Suggesting " + toReturn.m_X + ", " + toReturn.m_Y + " WumpusProb: " + toReturn.m_probabilityWump);
         return toReturn;
     }
 }
