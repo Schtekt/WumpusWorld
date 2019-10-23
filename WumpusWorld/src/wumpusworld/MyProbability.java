@@ -517,7 +517,7 @@ public class MyProbability
         models.add(toSend);
 
         // run a recursive funtion whihc generates all possible maps. saves theese maps to the list.
-        recurPossibleWorlds(models, possiblePits, 0, 0, true);
+        recurPossibleWorlds(models, possiblePits, 0, 0);
 
         return models;
     }
@@ -528,9 +528,8 @@ public class MyProbability
      * @param possiblePits
      * @param depth
      * @param model
-     * @param setPit
      */
-    private void recurPossibleWorlds(ArrayList<String[][]> models, ArrayList<Coordinate> possiblePits, int depth, int model, boolean setPit)
+    private void recurPossibleWorlds(ArrayList<String[][]> models, ArrayList<Coordinate> possiblePits, int depth, int model)
     {
         // the pit can either exist or not, so like a binary tree this method chooses to give the last added map in the list a pit
         // and then generate a new map where this pit does not exist.
@@ -562,27 +561,35 @@ public class MyProbability
         // if the depth hasnt been reached, keep digging!
         if(depth < possiblePits.size() - 1)
         {
-            recurPossibleWorlds(models, possiblePits, depth + 1, model, true);
-            recurPossibleWorlds(models, possiblePits, depth + 1, model + 1, false);
+            recurPossibleWorlds(models, possiblePits, depth + 1, model);
+            recurPossibleWorlds(models, possiblePits, depth + 1, model + 1);
         }
     }
 
+    /**
+     * Gets the first and safest room in the list. Calculate must be used before this method.
+     * @param rooms list of rooms that are to be evaluated
+     * @param hasArrow boolean showing if the AI has an arrow or not, if it has an arrow, it will be able to enter rooms where the wumpus may reside.
+     * @return
+     */
     public Coordinate getSafestCoordinates(List<MyPRoom> rooms, boolean hasArrow)
     {
+        // Initiate variables that is to be used.
         int bestWump = 100;
         int bestPit = 100;
         int startPoint = 0;
         Coordinate toReturn = null;
-
         MyPRoom tmp = rooms.get(startPoint++);
 
+        // Add temporary values to the variable toReturn. Values such as the probability of a pit and/or wumpus...
         toReturn = new Coordinate(tmp.getX(), tmp.getY());
         bestWump = m_wumpProb[tmp.getX() - 1][tmp.getY() - 1];
         bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
         toReturn.m_probabilityWump = bestWump;
         toReturn.m_probabilityPit = bestPit;
-        System.out.println("First choice: " + tmp.getX() + ", " + tmp.getY());
 
+        // first if check, if the AI has a choice between atleast two rooms and the first room was a wumpus AND the AI already fired their arrow, then avoid
+        // the wumpus at all cost...
         if(toReturn.m_probabilityWump == 100 && !hasArrow && rooms.size() > 1)
         {
             tmp = rooms.get(startPoint++);
@@ -594,14 +601,13 @@ public class MyProbability
             System.out.println("Second choice: " + tmp.getX() + ", " + tmp.getY());
         }
 
+        // Loop and compare all rooms.
         for(int i = startPoint; i < rooms.size(); i++)
         {
             tmp = rooms.get(i);
 
-            System.out.println(tmp.getX() + ", " + tmp.getY() + " has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
-            System.out.println(tmp.getX() + ", " + tmp.getY() + " has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
-
-            //System.out.println(i + "st choice: " + tmp.getX() + ", " + tmp.getY());
+            // If the wumpus' position is known, and there aint no pit there, then choose the wumpus room as the target.
+            // (Assuming that the player has an arrow that is...)
             if (m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] == 100 && m_pitProb[tmp.getX() - 1][tmp.getY() - 1] == 0)
             {
                 if (toReturn.m_probabilityPit != 0)
