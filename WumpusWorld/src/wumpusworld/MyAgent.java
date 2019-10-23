@@ -143,15 +143,6 @@ public class MyAgent implements Agent
         updateAvailableRooms(cX, cY);
         updateSafeRooms();
 
-        for (MyPRoom room : availableRoomsDeque)
-        {
-            System.out.println("Available room " + room.getX() + ", " + room.getY() + " has h value: " + room.getH());
-        }
-        for (MyPRoom room : safeRoomsDeque)
-        {
-            System.out.println("Safe room " + room.getX() + ", " + room.getY());
-        }
-
         // Select the first room in the safe rooms linked list.
         // It should be the cheapest one to move to from the 
         // player's current position

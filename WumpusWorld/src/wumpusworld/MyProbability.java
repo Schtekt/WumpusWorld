@@ -576,7 +576,7 @@ public class MyProbability
         bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
         toReturn.m_probabilityWump = bestWump;
         toReturn.m_probabilityPit = bestPit;
-        System.out.println("First choice: " + tmp.getX() + ", " + tmp.getY());
+        // System.out.println("First choice: " + tmp.getX() + ", " + tmp.getY());
 
         if(toReturn.m_probabilityWump == 100 && !hasArrow && rooms.size() > 1)
         {
@@ -586,15 +586,15 @@ public class MyProbability
             bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
             toReturn.m_probabilityWump = bestWump;
             toReturn.m_probabilityPit = bestPit;
-            System.out.println("Second choice: " + tmp.getX() + ", " + tmp.getY());
+            // System.out.println("Second choice: " + tmp.getX() + ", " + tmp.getY());
         }
 
         for(int i = startPoint; i < rooms.size(); i++)
         {
             tmp = rooms.get(i);
 
-            System.out.println(tmp.getX() + ", " + tmp.getY() + " has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
-            System.out.println(tmp.getX() + ", " + tmp.getY() + " has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
+            // System.out.println(tmp.getX() + ", " + tmp.getY() + " has a wump of " + m_wumpProb[tmp.getX() - 1][tmp.getY() - 1]);
+            // System.out.println(tmp.getX() + ", " + tmp.getY() + " has a pit of " + m_pitProb[tmp.getX() - 1][tmp.getY() - 1]);
 
             //System.out.println(i + "st choice: " + tmp.getX() + ", " + tmp.getY());
             if (m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] == 100 && m_pitProb[tmp.getX() - 1][tmp.getY() - 1] == 0)
