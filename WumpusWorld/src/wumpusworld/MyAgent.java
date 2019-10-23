@@ -14,12 +14,27 @@ import wumpusworld.MyProbability.Coordinate;
 public class MyAgent implements Agent
 {
     private World w;
-    int rnd;
     int count = 0;
+    /**
+     * A double ended queue containing all non-visited rooms available for movement
+     */
     LinkedList<MyPRoom> availableRoomsDeque;
+    /**
+     * A double ended queue containing all rooms known to be free from pits and wumpuses
+     */
     LinkedList<MyPRoom> safeRoomsDeque;
+    /**
+     * The path of rooms for the AI to follow from the current room to the target room
+     */
     LinkedList<MyPRoom> path;
-    LinkedList<MyPRoom> otherSideOfPit;
+    /**
+     * Best available room found to be on the other side of a pit. The room is saved in case crossing the
+     * pit is later found to be the best possible action to take
+     */
+    MyPRoom otherSideOfPit;
+    /**
+     * A boolean stating whether or not the AI is currently on its way to kill the wumpus
+     */
     boolean killWump;
 
     MyProbability probCalc;
@@ -31,18 +46,17 @@ public class MyAgent implements Agent
     public MyAgent(World world)
     {
         w = world;
+        // Function to initiate static class Path
         Path.Init(w);
 
-        Path.visitedRoomsDeque = new LinkedList<MyPRoom>();
+        // Initiate member variables
         availableRoomsDeque = new LinkedList<MyPRoom>();
         safeRoomsDeque = new LinkedList<MyPRoom>();
         path = new LinkedList<MyPRoom>();
-        otherSideOfPit = new LinkedList<MyPRoom>();
+        otherSideOfPit = null;
         killWump = false;
 
         probCalc = new MyProbability(w.getSize());
-        //MyPRoom tmp = new MyPRoom(1,1);
-        //tmp.setPerception(w.hasStench(1, 1), w.hasBreeze(1,1), w.hasGlitter(1,1), w.hasWumpus(1, 1), w.hasPit(1,1));
     }
    
     /**
@@ -60,13 +74,19 @@ public class MyAgent implements Agent
         {
             w.doAction(World.A_CLIMB);
         }
+        // Find relative coordinates of target room
         int relX = room.getX() - w.getPlayerX();
         int relY = room.getY() - w.getPlayerY();
+        // Check so the target room is actually adjacent to the current room
         if (Math.abs(relX + relY) == 1)
         {
+            // Numbered map of the directions
             //     0
             // 3        1
             //     2
+
+            // Calculate which direction to turn to and find which sequence of moves
+            // will turn the AI to that direction
             int dir = Path.calcCorrectDirection(relX, relY);
             int turn = w.getDirection() - dir;
             switch(turn)
@@ -84,12 +104,15 @@ public class MyAgent implements Agent
                     w.doAction(World.A_TURN_LEFT);
                     w.doAction(World.A_TURN_LEFT);
                     break;
+                default:
+                    break;
             }
+            // If the AI is headed into a room where a wumpus might be, shoot
             if (killWump && room.equals(goal))
             {
-                //System.out.println("SHOOT");
                 w.doAction(World.A_SHOOT);
             }
+            // After turning and possibly shooting, finally move forward
             w.doAction(World.A_MOVE);
             return true;
         }
@@ -152,7 +175,7 @@ public class MyAgent implements Agent
         {
             calcDone = doCalc();
         }
-        otherSideOfPit.clear();
+        otherSideOfPit = null;
         boolean maybeWump = false;
         do {
             killWump = false;
@@ -170,19 +193,17 @@ public class MyAgent implements Agent
                 Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque, w.hasArrow());
                 MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
                 
-                // System.out.println("Prob wump: " + room.m_probabilityWump);
                 if(room.m_probabilityWump > 0)
                 {
                     killWump = true;
-                    //System.out.println("Kill the wumpus!");
                 }
                 
                 goalRoom = tmp;
                 
-                if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && !otherSideOfPit.isEmpty())
+                if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && otherSideOfPit != null)
                 {
                     maybeWump = true;
-                    goalRoom = otherSideOfPit.pop();
+                    goalRoom = otherSideOfPit;
                 }
                 else if(availableRoomsDeque.contains(tmp))
                 {
@@ -198,8 +219,7 @@ public class MyAgent implements Agent
             path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
             if(Path.m_Pit)
             {
-                //System.out.println("The path has a pit");
-                otherSideOfPit.add(goalRoom);
+                otherSideOfPit = goalRoom;
             }
 
         }while (Path.m_Pit && !maybeWump);

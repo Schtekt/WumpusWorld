@@ -71,6 +71,7 @@ public class Path
         m_World = world;
         m_OpenList = new LinkedList<MyPRoom>();
         m_PathFound = new LinkedList<MyPRoom>();
+        visitedRoomsDeque = new LinkedList<MyPRoom>();
     }
 
     /**

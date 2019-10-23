@@ -187,13 +187,11 @@ public class GUI implements ActionListener
     private void createWindow()
     {
         frame = new JFrame("Wumpus World");
-        frame.setSize(820, 640);
+        frame.setSize(920, 640);
         frame.getContentPane().setLayout(new FlowLayout());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        // Change size to make sure buttons are visible
-        frame.setSize(900, 640);
         
+        // Change colour of frame for aesthetical reasons
         frame.getContentPane().setBackground(Color.black);
 
         gamepanel = new JPanel();
@@ -213,9 +211,9 @@ public class GUI implements ActionListener
                 blocks[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
                 blocks[i][j].setLayout(new GridLayout(2,2));
 
-                /*Different layout to incorporate my icons,
+                /*Different layout to incorporate my icons.
                 BorderLayout without specifying location
-                of components will put the m all in center
+                of components will place them all in the center
                 and only the last one added (my panel) will
                 be shown*/
                 blocks[i][j].setLayout(new BorderLayout());
@@ -270,11 +268,10 @@ public class GUI implements ActionListener
         br.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(br);
         JButton bg = new JButton("Grab");
-        bg.setPreferredSize(new Dimension(45,22));
+        bg.setPreferredSize(new Dimension(85,22));
         bg.setActionCommand("GRAB");
         bg.addActionListener(this);
-
-        // Set button image because why not
+        // Set my icon
         bg.setPreferredSize(null);
         bg.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
         bg.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
@@ -284,10 +281,10 @@ public class GUI implements ActionListener
         bg.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bg);
         JButton bc = new JButton("Climb");
-        bc.setPreferredSize(new Dimension(55,22));
+        bc.setPreferredSize(new Dimension(85,22));
         bc.setActionCommand("CLIMB");
         bc.addActionListener(this);
-        // Set button image because why not
+        // Set my icon
         bc.setPreferredSize(null);
         bc.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
         bc.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
@@ -297,10 +294,10 @@ public class GUI implements ActionListener
         bc.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bc);
         JButton bs = new JButton("Shoot");
-        bs.setPreferredSize(new Dimension(65,22));
+        bs.setPreferredSize(new Dimension(85,22));
         bs.setActionCommand("SHOOT");
         bs.addActionListener(this);
-        // Set button image because why not
+        // Set my icon
         bs.setPreferredSize(null);
         bs.setIcon(new ImageIcon("src/wumpusworld/myGFX/button.png"));
         bs.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonPressed.png"));
@@ -310,11 +307,11 @@ public class GUI implements ActionListener
         bs.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bs);
         JButton ba = new JButton("Run Solving Agent");
-        // Change name of Solving Agent just because
+        // Change name of Solving Agent because his name is clearly Gunnar
         ba.setText("Run Gunnar");
         ba.setActionCommand("AGENT");
         ba.addActionListener(this);
-        // Set button image because why not
+        // Set my icon
         ba.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
         ba.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLargePressed.png"));
         ba.setHorizontalTextPosition(JButton.CENTER);
@@ -339,7 +336,7 @@ public class GUI implements ActionListener
         JButton bn = new JButton("New Game");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
-        // Set button image because why not
+        // Set my icon
         bn.setIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLarge.png"));
         bn.setPressedIcon(new ImageIcon("src/wumpusworld/myGFX/buttonLargePressed.png"));
         bn.setHorizontalTextPosition(JButton.CENTER);
@@ -348,7 +345,7 @@ public class GUI implements ActionListener
         bn.setBorder(BorderFactory.createEmptyBorder());
         buttons.add(bn);
         
-        // Setting up my legend
+        // Setting up my legend to explain the new icons in-game
         JLabel legend = new JLabel();
         legend.setIcon(new ImageIcon("src/wumpusworld/MyGFX/legend.png"));
         legend.setPreferredSize(new Dimension(200, 350));

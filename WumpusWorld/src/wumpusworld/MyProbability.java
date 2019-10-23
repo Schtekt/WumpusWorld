@@ -569,12 +569,12 @@ public class MyProbability
     /**
      * Gets the first and safest room in the list. Calculate must be used before this method.
      * @param rooms list of rooms that are to be evaluated
-     * @param hasArrow boolean showing if the AI has an arrow or not, if it has an arrow, it will be able to enter rooms where the wumpus may reside.
-     * @return
+     * @param hasArrow boolean showing if the AI has an arrow or not, if it has an arrow, it will be able to enter rooms where the wumpus might reside.
+     * @return coordinates of the safest room
      */
     public Coordinate getSafestCoordinates(List<MyPRoom> rooms, boolean hasArrow)
     {
-        // Initiate variables that is to be used.
+        // Initiate variables that are to be used.
         int bestWump = 100;
         int bestPit = 100;
         int startPoint = 0;
@@ -598,7 +598,6 @@ public class MyProbability
             bestPit = m_pitProb[tmp.getX() - 1][tmp.getY() - 1];
             toReturn.m_probabilityWump = bestWump;
             toReturn.m_probabilityPit = bestPit;
-            // System.out.println("Second choice: " + tmp.getX() + ", " + tmp.getY());
         }
 
         // Loop and compare all rooms.
@@ -606,8 +605,10 @@ public class MyProbability
         {
             tmp = rooms.get(i);
 
-            // If the wumpus' position is known, and there aint no pit there, then choose the wumpus room as the target.
+            // If the wumpus' position is known, and there is no pit there, then choose the wumpus room as the target.
             // (Assuming that the player has an arrow that is...)
+            // These if-else-if statements are a botch job. They accomplish what they are supposed to,
+            // but should really be cleaned up
             if (m_wumpProb[tmp.getX() - 1][tmp.getY() - 1] == 100 && m_pitProb[tmp.getX() - 1][tmp.getY() - 1] == 0)
             {
                 if (toReturn.m_probabilityPit != 0)
