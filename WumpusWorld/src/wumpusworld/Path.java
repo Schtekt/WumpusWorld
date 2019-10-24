@@ -15,12 +15,12 @@ public class Path
     private static LinkedList<MyPRoom> m_OpenList;
 
     /**
-     * X coordinate of the goal room.
+     * X-coordinate of the goal room.
      */
 
     private static int m_GoalX;
     /**
-     * Y coordinate of the goal room.
+     * Y-coordinate of the goal room.
      */
     private static int m_GoalY;
 
@@ -77,14 +77,14 @@ public class Path
     /**
      * Calculates the correct direction the player has to face to move into an adjacent room.
      * Calculate relative coordinates by subtracting next location by the current location.
-     * @param relX Relative X coordinate. Either 1 or -1 or 0. (next - current)
-     * @param relY Relative Y coordinate. Either 1 or -1 or 0. (next - current)
+     * @param relX Relative x-coordinate. Either 1 or -1 or 0. (next - current)
+     * @param relY Relative y-coordinate. Either 1 or -1 or 0. (next - current)
      * @return the direction the player should face to move towards the next room.
      */
     public static int calcCorrectDirection(int relX, int relY)
     {
         /*
-            Input 0, 1 (this should become 0).
+            Put in 0, 1 (this should become 0).
             abs(2*0 + 1 - 1) = 0
 
             1,0
@@ -109,17 +109,17 @@ public class Path
     public static int calcDirectionalCost(int corrDirection, int currDirection)
     {
         /*
-        say we input 1 and 3.
+        say we put in 1 and 3.
         normalized = 2
         normalized % 2 = 0.
         returns 0 + abs(0-1)*2 = 2.
 
-        say we input 2 and 1. (vice versa gives same result)
+        say we put in 2 and 1. (vice versa gives same result)
         normalized = 1.
         normalized % 2 = 1.
         returns 1 + abs(1 - 1)*1 = 1.
 
-        say we input 4 and 4.
+        say we put in 0 and 0.
         normalized = 0.
         normalized % 2 = 0.
         returns 0 + abs(0 -1) * 0 = 0
@@ -134,8 +134,8 @@ public class Path
      * the current room. If it is, the room is added to
      * the open list, its g and f values are set, and
      * the current room is set as parent room.
-     * @param relX x coordinate of the room relative to the current room
-     * @param relY y coordinate of the room relative to the current room
+     * @param relX x-coordinate of the room relative to the current room
+     * @param relY y-coordinate of the room relative to the current room
      */
     private static void AddToOpen(int relX, int relY)
     {
@@ -255,10 +255,10 @@ public class Path
      * Finds the cheapest path from the the specified start room to
      * the specified goal room. Returns the path as a {@code LinkedList}
      * of {@code MyPRoom}.
-     * @param goalX the x coordinate of the goal room
-     * @param goalY the y coordinate of the goal room
-     * @param startX the x coordinate of the start room
-     * @param startY the y coordinate of the start room
+     * @param goalX the x-coordinate of the goal room
+     * @param goalY the y-coordinate of the goal room
+     * @param startX the x-coordinate of the start room
+     * @param startY the y-coordinate of the start room
      * @return the path from the start room to the goal room
      */
     public static LinkedList<MyPRoom> FindPath(int goalX, int goalY, int startX, int startY)

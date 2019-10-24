@@ -1,6 +1,4 @@
 package wumpusworld;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 import wumpusworld.MyProbability.Coordinate;
@@ -125,6 +123,7 @@ public class MyAgent implements Agent
      */
     public boolean doCalc()
     {
+        // Get the perception data for each room
         String[][] perception = new String[w.getSize()][w.getSize()];
         for(int i = 1; i <= w.getSize(); i++)
         {
@@ -133,8 +132,9 @@ public class MyAgent implements Agent
                 perception[i-1][j-1] = percieveRoom(i, j);
             }
         }
+        // Send the data to the probability calculator
         probCalc.setData(perception);
-        
+        // Calculate the viability of moving to each of the rooms
         probCalc.calculate(availableRoomsDeque);
 
         return true;
@@ -149,6 +149,7 @@ public class MyAgent implements Agent
         int cX = w.getPlayerX();
         int cY = w.getPlayerY();
         
+        // If the room is not already visited, add it to the visited rooms
         MyPRoom visitedRoom = new MyPRoom(cX, cY);
         if(!Path.visitedRoomsDeque.contains(visitedRoom))
         {
@@ -163,14 +164,14 @@ public class MyAgent implements Agent
             return;
         }
         
+        // Update the lists of available and safe rooms
         updateAvailableRooms(cX, cY);
         updateSafeRooms();
 
-        // Select the first room in the safe rooms linked list.
-        // It should be the cheapest one to move to from the 
-        // player's current position
         MyPRoom goalRoom;
         boolean calcDone = false;
+        // If the safe list is empty we need to calculate which of the available rooms
+        // would be the best to move to
         if(safeRoomsDeque.isEmpty() && !availableRoomsDeque.isEmpty())
         {
             calcDone = doCalc();
@@ -179,37 +180,48 @@ public class MyAgent implements Agent
         boolean maybeWump = false;
         do {
             killWump = false;
+            // Select the first room in the safe rooms linked list.
+            // It should be the cheapest one to move to from the
+            // position of the player
             if(!safeRoomsDeque.isEmpty())
             {
                 goalRoom = safeRoomsDeque.pop();
                 availableRoomsDeque.remove(goalRoom);
             }
+            // If there are no safe rooms, we need to take a room from the list of
+            // available rooms
             else if(!availableRoomsDeque.isEmpty())
             {
+                // If we have not done the calculations, do them now
                 if (!calcDone)
                 {
                     calcDone = doCalc();
                 }
+                // Get which room is safest to move to
                 Coordinate room = probCalc.getSafestCoordinates(availableRoomsDeque, w.hasArrow());
-                MyPRoom tmp = new MyPRoom(room.m_X, room.m_Y);
+                goalRoom = new MyPRoom(room.m_X, room.m_Y);
                 
+                // If the room we are moving to might have a wumpus, prepare to kill it
                 if(room.m_probabilityWump > 0)
                 {
                     killWump = true;
                 }
                 
-                goalRoom = tmp;
-                
+                // If there might be a wump (but we do not know for sure) we prefer to look on the other side
+                // of a pit (Do we really?)
                 if (room.m_probabilityWump > 0 && room.m_probabilityWump < 100 && otherSideOfPit != null)
                 {
                     maybeWump = true;
                     goalRoom = otherSideOfPit;
                 }
-                else if(availableRoomsDeque.contains(tmp))
+                // Remove the goalRoom from the list of available rooms
+                else if(availableRoomsDeque.contains(goalRoom))
                 {
-                    availableRoomsDeque.remove(tmp);
+                    availableRoomsDeque.remove(goalRoom);
                 }
             }
+            // If there are no safe rooms and no available rooms, set the goalRoom to the current room.
+            // This should not happen, it is just a safety measure
             else
             {
                 goalRoom = new MyPRoom(cX, cY);
@@ -217,17 +229,23 @@ public class MyAgent implements Agent
 
             // Find path to next room
             path = Path.FindPath(goalRoom.getX(), goalRoom.getY(), cX, cY);
-            if(Path.m_Pit)
+            // If the room is on the other side of a pit and it is the first room found,
+            // we save it in case it later turns out to be the best choice
+            if(Path.m_Pit && otherSideOfPit != null)
             {
                 otherSideOfPit = goalRoom;
             }
-
+            
+            // If the room is on the other side of a pit we want to search for another room.
         }while (Path.m_Pit && !maybeWump);
 
         // Loop through the path and move to each room in turn until the goal room is reached
         while (!path.isEmpty())
         {
-            MoveToRoom(path.pop(), goalRoom);
+            if (!MoveToRoom(path.pop(), goalRoom))
+            {
+                System.out.println("ERROR! Room is not adjacent to current room");
+            }
         }
         
         //Test the environment
@@ -242,6 +260,7 @@ public class MyAgent implements Agent
         if (w.hasPit(cX, cY))
         {
             System.out.println("I am in a Pit");
+            // Set the room to have a pit, so it can be avoided in the pathfinding
             int index = Path.visitedRoomsDeque.indexOf(visitedRoom);
             visitedRoom = Path.visitedRoomsDeque.get(index);
             if(!visitedRoom.hasPit())
@@ -264,38 +283,16 @@ public class MyAgent implements Agent
         if (w.getDirection() == World.DIR_DOWN)
         {
             System.out.println("I am facing Down");
-        }
-
-        try
-        {
-            String content = "";
-            content += "When player was in position (" + cX + ", " + cY + ") and turned to " + w.getDirection() + " on turn " + ++count + "\nThe ai found the following rooms as available ones:\n";
-            for(int i = 0; i < availableRoomsDeque.size(); i++)
-            {
-                MyPRoom tmp = availableRoomsDeque.get(i);
-                content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
-            }
-
-            if(safeRoomsDeque.size() > 0)
-            {
-                content += "It also found theese rooms to be safe.\n";
-
-                for(int i = 0; i < safeRoomsDeque.size(); i++)
-                {
-                    MyPRoom tmp = safeRoomsDeque.get(i);
-                    content += "(" + tmp.getX() + ", " + tmp.getY() + ")\n";
-                }
-            }
-            FileWriter wr = new FileWriter("../info.txt");
-            wr.write(content);
-            wr.close();
-        }
-        catch(IOException e)
-        {
-
-        }              
+        }          
     }
 
+    /**
+     * Checks all adjacent rooms and adds them to the list of available
+     * rooms if they are valid and not visited. If the room is already
+     * in the list, it will be updated.
+     * @param playerX The x-coordinate of the player
+     * @param playerY The x-coordinate of the player
+     */
     void addAvailableRooms(int playerX, int playerY)
     {
         int x = playerX + (w.getDirection() -2)%2;
@@ -348,10 +345,19 @@ public class MyAgent implements Agent
         }
     }
 
+    /**
+     * Updates the list of available rooms, adding all adjacent rooms
+     * not already visited. Then sorts the romms based on proximity
+     * to the player. 
+     * @param playerX The x-coordinate of the player
+     * @param playerY The y-coordinate of the player
+     */
     void updateAvailableRooms(int playerX, int playerY)
     {
+        // Add available rooms to the list
         addAvailableRooms(playerX, playerY);
 
+        // Update the distance of the rooms to the player and remove visited rooms from the list 
         for(int i = 0; i < availableRoomsDeque.size(); i++)
         {
             MyPRoom tmp = availableRoomsDeque.get(i);
@@ -361,7 +367,7 @@ public class MyAgent implements Agent
                 availableRoomsDeque.remove(i);
             }
         }
-
+        // Sort the rooms by distance to the player
         availableRoomsDeque.sort(new Comparator<MyPRoom>() {
             @Override
             public int compare(MyPRoom r1, MyPRoom r2)
@@ -371,8 +377,14 @@ public class MyAgent implements Agent
         });
     }
     
+    /**
+     * Updates the list of safe rooms, using the list of available rooms
+     */
     void updateSafeRooms()
     {
+        // Run throught the list of available rooms and add all rooms
+        // that are sure to not contain a pit or a wumpus to the list
+        // of safe rooms
         for(int i = availableRoomsDeque.size() - 1; i >= 0; i--)
         {
             MyPRoom tmp = availableRoomsDeque.get(i);
@@ -388,7 +400,7 @@ public class MyAgent implements Agent
                 safeRoomsDeque.push(tmp);
             }
         }
-
+        // Remove visited rooms from the list
         for(int i = 0; i < safeRoomsDeque.size(); i++)
         {
             MyPRoom tmp = safeRoomsDeque.get(i);
@@ -399,6 +411,12 @@ public class MyAgent implements Agent
         }
     }
     
+    /**
+     * Checks if the room is definitely without a pit
+     * @param x The x-coordinate of the room to check
+     * @param y The y-coordinate of the room to check
+     * @return {@code true} if the room is definitely free from a pit
+     */
     boolean pitNo(int x, int y)
     {
         return     w.isValidPosition(x + 1, y) && !w.hasBreeze(x + 1, y) && !w.isUnknown(x + 1, y)
@@ -407,6 +425,12 @@ public class MyAgent implements Agent
                 || w.isValidPosition(x, y - 1) && !w.hasBreeze(x, y - 1) && !w.isUnknown(x, y - 1);
     }
 
+    /**
+     * Checks if the room is definitely without a wumpus
+     * @param x The x-coordinate of the room to check
+     * @param y The y-coordinate of the room to check
+     * @return {@code true} if the room is definitely free from a wumpus
+     */
     boolean wumpNo(int x, int y)
     {
         return     w.isValidPosition(x + 1, y) && !w.hasStench(x + 1, y) && !w.isUnknown(x + 1, y)
@@ -415,6 +439,12 @@ public class MyAgent implements Agent
                 || w.isValidPosition(x, y - 1) && !w.hasStench(x, y - 1) && !w.isUnknown(x, y - 1);
     }
     
+    /**
+     * Checks the known percepts of the given room.
+     * @param x The x-coordinate of the room to check
+     * @param y The y-coordinate of the room to check
+     * @return a {@code string} containing the known percepts of the room
+     */
     String percieveRoom(int x, int y)
     {
         String tmp = "";
@@ -452,30 +482,6 @@ public class MyAgent implements Agent
         }
 
         return tmp;
-    }
-    
-    int calcMoveCost(int playX, int playY, int tarX, int tarY, int currDirection)
-    {
-        if(w.isValidPosition(playX + 1, playY))
-        {
-            calcMoveCost(playX + 1, playY, tarX, tarY, World.DIR_RIGHT);
-        }
-
-        if(w.isValidPosition(playX - 1, playY))
-        {
-            calcMoveCost(playX - 1, playY, tarX, tarY, World.DIR_LEFT);
-        }
-
-        if(w.isValidPosition(playX, playY + 1))
-        {
-            calcMoveCost(playX, playY + 1, tarX, tarY, World.DIR_UP);
-        }
-
-        if(w.isValidPosition(playX, playY - 1))
-        {
-            calcMoveCost(playX, playY - 1, tarX, tarY, World.DIR_DOWN);
-        }
-        return 0;
     }
 }
 
